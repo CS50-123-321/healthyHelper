@@ -3,10 +3,9 @@ package bot
 import (
 	"StreakHabitBulder/config"
 	"context"
-	"fmt"
+	"encoding/json"
 	"log"
 	"sort"
-	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -64,23 +63,41 @@ func getMembersIDs() (ids []int, err error) {
 
 func SetMemberLevel(memberHabit map[int]Habit) {
 	for _, h := range memberHabit {
-
-		DysCount := len(h.DaysLog)
-		percentageCompleted := DysCount / h.CommitmentPeriod * h.CommitmentPeriod
+		percentageCompleted := (h.TotalDays *100/ h.CommitmentPeriod) 
+		//percentageCompleted := 100
 		LevelMessage(h, percentageCompleted)
 	}
 }
 
 // This get called by the cron job to run daily and sets the day as false, it will be true if the member did sport.
 func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
-	daysLogBytes := []byte(fmt.Sprintf("{\"%v\":false}", strconv.Itoa(time.Now().Day())))
-	pipe.HSet(context.Background(), key, "days_log", daysLogBytes)
+	h, err := getDaysRecord(key)
+	if err != nil {
+		log.Println("error getting days record: %v", err)
+		return nil
+	}
+
+	// Unmarshell it to the struct
+	err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)
+	if err != nil {
+		log.Println("error unmarshalling JSON: %v", err)
+		return nil
+	}
+
+	// Marking day as true
+	h.DaysLog[time.Now().Minute()] = false
+	h.DaysLogByte, err = json.Marshal(h.DaysLog)
+	if err != nil {
+		return nil
+	}
+	pipe.HSet(context.Background(), key, "days_log", h.DaysLogByte)
 	// New Joiner
 	return pipe
 }
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Iterator() {
+	log.Println("Itratings")
 	teleIDS, err := getMembersIDs()
 	if err != nil {
 		log.Println("err in InitOffDay while getting all member id: ", err)

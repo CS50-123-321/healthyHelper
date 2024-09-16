@@ -22,21 +22,33 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 		msg = fmt.Sprintf(
 			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/l2Sq8sGtwGw0G7yW0/giphy.gif" 
+		gifURL = "https://media.giphy.com/media/l2Sq8sGtwGw0G7yW0/giphy.gif"
 	case percentageCompleted == 60:
 		msg = fmt.Sprintf(
 			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif" 
+		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif"
 	case percentageCompleted == 30:
 		msg = fmt.Sprintf(
 			"🌟 Great progress, *%s*! You've hit *30%%* of your habit **%s**! You're now a *Motivation Seeker*! Keep that momentum going! 💥",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif" 
+		gifURL = "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"
 	case percentageCompleted == 10:
 		msg = fmt.Sprintf(
 			"✨ Nice start, *%s*! You've completed *10%%* of your habit **%s**! You're officially a *Rising Star*! Keep up the effort, you've got this! ⭐",
 			h.Name, h.HabitName)
+		gifURL = "https://media.giphy.com/media/l46CjFkIMsxw6fQ5K/giphy.gif"
+	case percentageCompleted == 0:
+		msg = fmt.Sprintf(
+			"🎉 Welcome, *%s*! 🎉\n\n"+
+				"We're excited to have you on board for your new habit: **%s**! 💪\n"+
+				"You've committed to building this habit for the next **%d days**. 🗓️\n\n"+
+				"Stay strong and consistent, and we know you'll crush it! 🚀\n"+
+				"Track your progress, stay motivated, and feel free to share your journey with the group! We're all cheering for you! 🙌✨\n\n[Welcome GIF!](https://giphy.com/gifs/welcome)",
+			h.Name,
+			h.HabitName,
+			h.CommitmentPeriod,
+		)
 		gifURL = "https://media.giphy.com/media/l46CjFkIMsxw6fQ5K/giphy.gif"
 	}
 

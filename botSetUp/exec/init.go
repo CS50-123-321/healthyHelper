@@ -1,7 +1,6 @@
 package exec
 
 import (
-	"StreakHabitBulder/bot"
 	"StreakHabitBulder/config"
 	cron "StreakHabitBulder/crons"
 )
@@ -9,7 +8,13 @@ import (
 func Init() {
 	config.InitTele()
 	config.InitRedis()
-	bot.Iterator() // for testingjn
-	bot.BotInit()
-	cron.InitCron()
+	// go func() {
+	// 	bot.BotInit()
+	// 	select {}
+	// }()
+	go func() {
+		cron.InitCron()
+		select {}
+	}()
+	select {}
 }

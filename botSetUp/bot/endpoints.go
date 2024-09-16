@@ -31,21 +31,25 @@ func StreakListner() {
 		if err != nil {
 			return fmt.Errorf("error unmarshalling JSON: %v", err)
 		}
-
 		// Marking day as true
-		h.DaysLog[time.Now().Day()] = true
+		h.DaysLog[time.Now().Minute()] = true
+
+		h.DaysLogByte, err = json.Marshal(h.DaysLog)
+		if err != nil {
+			return err
+		}
+		h.getStreakByUser() //calc streak info
 		if h.TopHit == 0 {
 			h.TotalDays = 0
 			h.Streaked = 0
 			return config.Rdb.HSet(context.Background(), key, h).Err()
 		}
-		h.getStreakByUser()
-		h.DaysLogByte, err = json.Marshal(h.DaysLog)
-		if err != nil {
-			return err
+		// handle when the user finished the period
+		if h.TotalDays == h.CommitmentPeriod {
+			log.Println("You have made it, set another challege and start again!!")
 		}
 		err = config.Rdb.HSet(context.Background(), key, h).Err()
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		// setting The Current level and informing them.
@@ -54,7 +58,6 @@ func StreakListner() {
 		SetMemberLevel(dump)
 		return err
 	})
-
 	log.Println("Listeners are running")
 	config.B.Start()
 }
