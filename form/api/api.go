@@ -11,6 +11,7 @@ import (
 
 func InitRoutes() {
 	GetUserBotID()
+
 }
 func server(TId int64) {
 	var h *Habit
@@ -42,16 +43,24 @@ func server(TId int64) {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"result": h})
+		config.B.Close()
+		log.Println("stopping the bot")
 	})
 
-	router.Run(":9000")
+	if err := router.Run(":9000"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+
 }
 func GetUserBotID() {
 	config.B.Handle("/start", func(c tele.Context) error {
 		c.Send("Click Join!!")
 		server(c.Sender().ID)
+		config.B = nil
+		log.Println("stopping the bot")
 		return nil
 	})
 	log.Println("bot is running")
 	config.B.Start()
+
 }

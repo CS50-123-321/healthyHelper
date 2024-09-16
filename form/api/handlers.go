@@ -5,13 +5,9 @@ import (
 	"encoding/json"
 	"familyFormUi/config"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
 	"time"
 
 	redis "github.com/redis/go-redis/v9"
-	tele "gopkg.in/telebot.v3"
 )
 
 func (h *Habit) Create() (err error) {
@@ -25,9 +21,15 @@ func (h *Habit) Create() (err error) {
 	}
 
 	h.DaysLog = make(map[int]bool)
+	h.NotificationLog = make(map[int]bool)
 	h.TotalDays = 0
+	h.TopHit = 0
 	h.Streaked = 0
 	daysLogJSON, err := json.Marshal(h.DaysLog)
+	if err != nil {
+		return err
+	}
+	h.NotificationLogBytes, err = json.Marshal(h.DaysLog)
 	if err != nil {
 		return err
 	}
@@ -40,31 +42,33 @@ func (h *Habit) Create() (err error) {
 		"streaked":          h.Streaked,
 		"days_log":          daysLogJSON, // Store as JSON string
 		"total_days":        h.TotalDays,
+		"top_hit":           h.TopHit,
+		"notification_log":  h.NotificationLogBytes,
 	}).Err()
 	if err != nil {
 		return err
 	}
 	// Adding all client ID to one space.
 	err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
-		Score:  float64(time.Now().Unix()),// TODO: Make it tele group id tocatogrize them.
+		Score:  float64(time.Now().Unix()), // TODO: Make it tele group id tocatogrize them.
 		Member: h.TeleID,
 	}).Err()
 	if err != nil {
 		return err
 	}
 
-	//TODO: notify
-	msg := fmt.Sprintf("%v, %v", h, h.TeleID)
-	botID, err := strconv.Atoi(os.Getenv("TestingBotID"))
-	if err != nil {
-		log.Println("err:", err)
-		return
-	}
-	t, err := config.B.Send(tele.ChatID(botID), msg)
-	if err != nil {
-		log.Println("err:", err)
-		return
-	}
-	log.Println(t)
+	// //TODO: notify
+	// msg := fmt.Sprintf("%v, %v", h, h.TeleID)
+	// botID, err := strconv.Atoi(os.Getenv("TestingBotID"))
+	// if err != nil {
+	// 	log.Println("err:", err)
+	// 	return
+	// }
+	// t, err := config.B.Send(tele.ChatID(botID), msg)
+	// if err != nil {
+	// 	log.Println("err:", err)
+	// 	return
+	// }
+	// log.Println(t)
 	return
 }

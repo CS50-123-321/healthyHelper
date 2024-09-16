@@ -34,19 +34,21 @@ type Streak struct {
 }
 
 type Habit struct {
-	Name                string       `json:"name" redis:"name" binding:"required"`
-	HabitName           string       `json:"habitName" redis:"habit_name" binding:"required"`
-	CommitmentPeriodStr string       `json:"commitmentPeriodStr"`
-	CommitmentPeriod    int          `redis:"commitment_period"`
-	TeleID              int          `redis:"tele_id"`
-	Streaked            int          `json:"streaked" redis:"streaked"`
-	TopHit              int          `json:"top_hit" redis:"top_hit"` // the highest dtreak reached.
-	DaysLog             map[int]bool // calc
-	DaysLogByte         []byte       `redis:"days_log"`
-	TotalDays           int          `redis:"total_days"` // calc
+	Name                 string       `json:"name" redis:"name" binding:"required"`
+	HabitName            string       `json:"habitName" redis:"habit_name" binding:"required"`
+	CommitmentPeriodStr  string       `json:"commitmentPeriodStr"`
+	CommitmentPeriod     int          `redis:"commitment_period"`
+	TeleID               int          `redis:"tele_id"`
+	Streaked             int          `json:"streaked" redis:"streaked"`
+	TopHit               int          `json:"top_hit" redis:"top_hit"` // the highest dtreak reached.
+	DaysLog              map[int]bool // calc
+	NotificationLog      map[int]bool
+	NotificationLogBytes []byte `redis:"notification_log"`
+	DaysLogByte          []byte `redis:"days_log"`
+	TotalDays            int    `redis:"total_days"` // calc
 	// StartDate
 	// Days count خابط
-}  
+}
 
 func (h *Habit) MarshalBinary() ([]byte, error) {
 	data, err := json.Marshal(h)

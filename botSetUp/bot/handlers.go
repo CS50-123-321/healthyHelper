@@ -24,7 +24,7 @@ func getDaysRecord(key string) (h Habit, err error) {
 	return h, err
 }
 
-func (h *Habit) getStreakByUser() {
+func (h *Habit) SetUserStreak() {
 
 	h.TotalDays = 0
 	h.Streaked = 0
@@ -32,6 +32,7 @@ func (h *Habit) getStreakByUser() {
 	daysLogSlice := make([]int, 0, len(h.DaysLog))
 	for day := range h.DaysLog {
 		daysLogSlice = append(daysLogSlice, day)
+
 	}
 	sort.Ints(daysLogSlice)
 	sortedMap := make(map[int]bool)
@@ -63,9 +64,16 @@ func getMembersIDs() (ids []int, err error) {
 
 func SetMemberLevel(memberHabit map[int]Habit) {
 	for _, h := range memberHabit {
-		percentageCompleted := (h.TotalDays *100/ h.CommitmentPeriod) 
-		//percentageCompleted := 100
-		LevelMessage(h, percentageCompleted)
+		percentageCompleted := (h.TotalDays * 100 / h.CommitmentPeriod)
+		if h.TotalDays == 1 {
+			percentageCompleted = 0
+		}
+		_, ok := h.NotificationLog[h.TeleID]
+		if !ok { // Send notification only if the user hasn't recevied a notification on this day.
+			LevelMessage(h, percentageCompleted)
+		} else {
+			log.Println("this user has been informed today already")
+		}
 	}
 }
 
@@ -93,6 +101,31 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 	pipe.HSet(context.Background(), key, "days_log", h.DaysLogByte)
 	// New Joiner
 	return pipe
+}
+func SetNotificationLog(key string) error {
+	h, err := getDaysRecord(key)
+	if err != nil {
+		log.Println("error getting days record: %v", err)
+		return nil
+	}
+
+	// Unmarshell it to the struct
+	err = json.Unmarshal([]byte(h.NotificationLogBytes), &h.NotificationLog)
+	if err != nil {
+		log.Println("error unmarshalling JSON: %v", err)
+		return nil
+	}
+	dum := make(map[int]bool)
+
+	// Marking day as true
+	dum[time.Now().Minute()] = true
+	h.NotificationLog = dum
+	h.NotificationLogBytes, err = json.Marshal(h.NotificationLog)
+	if err != nil {
+		return nil
+	}
+	return config.Rdb.HSet(context.Background(), key, "notification_log", h.NotificationLogBytes).Err()
+
 }
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!

@@ -38,7 +38,7 @@ func StreakListner() {
 		if err != nil {
 			return err
 		}
-		h.getStreakByUser() //calc streak info
+		h.SetUserStreak() //calc streak info
 		if h.TopHit == 0 {
 			h.TotalDays = 0
 			h.Streaked = 0
@@ -52,6 +52,9 @@ func StreakListner() {
 		if err != nil {
 			return err
 		}
+		// replay with the day count.
+		msg := fmt.Sprintf("Day %d, Streak: %d", h.TotalDays, h.Streaked)
+		config.B.Reply(c.Message(), msg)
 		// setting The Current level and informing them.
 		dump := make(map[int]Habit)
 		dump[h.TeleID] = h

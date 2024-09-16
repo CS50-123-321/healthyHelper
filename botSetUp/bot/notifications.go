@@ -22,7 +22,7 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 		msg = fmt.Sprintf(
 			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/l2Sq8sGtwGw0G7yW0/giphy.gif"
+		gifURL = "https://vsgif.com/gif/3553131"
 	case percentageCompleted == 60:
 		msg = fmt.Sprintf(
 			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
@@ -44,17 +44,21 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 				"We're excited to have you on board for your new habit: **%s**! 💪\n"+
 				"You've committed to building this habit for the next **%d days**. 🗓️\n\n"+
 				"Stay strong and consistent, and we know you'll crush it! 🚀\n"+
-				"Track your progress, stay motivated, and feel free to share your journey with the group! We're all cheering for you! 🙌✨\n\n[Welcome GIF!](https://giphy.com/gifs/welcome)",
+				"Track your progress, stay motivated, and feel free to share your journey with the group! We're all cheering for you! 🙌✨\n\n",
 			h.Name,
 			h.HabitName,
 			h.CommitmentPeriod,
 		)
-		gifURL = "https://media.giphy.com/media/l46CjFkIMsxw6fQ5K/giphy.gif"
 	}
 
 	if msg != "" {
+		// Setting the sent notigication true to avoid oversending msgs.
+		err := SetNotificationLog(RK(h.TeleID))
+		if err != nil {
+			return err
+		}
 		// Send the message with bold formatting (MarkdownV2)
-		err := Remind(msg)
+		err = Remind(msg)
 		if err != nil {
 			return err
 		}
