@@ -1,7 +1,9 @@
 package bot
 
 import (
+	"StreakHabitBulder/config"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -23,8 +25,13 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-func Remind(text string) bool {
+func Remind(text string) (err error) {
 	botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
-	b.Send(tele.ChatID(botID), text)
-	return true
+	_, err = config.B.Send(tele.ChatID(botID), text)
+	if err != nil {
+		log.Println("Remind: errsending the msg: ", err)
+	}
+	return err
 }
+
+func RK(id int) string { return fmt.Sprintf("habitMember:%d", id) }

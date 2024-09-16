@@ -44,7 +44,9 @@ type Habit struct {
 	DaysLog             map[int]bool // calc
 	DaysLogByte         []byte       `redis:"days_log"`
 	TotalDays           int          `redis:"total_days"` // calc
-}
+	// StartDate
+	// Days count خابط
+}  
 
 func (h *Habit) MarshalBinary() ([]byte, error) {
 	data, err := json.Marshal(h)

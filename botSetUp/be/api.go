@@ -1,7 +1,7 @@
 package be
 
 import (
-	"StreakHabitBulder/DB"
+	"StreakHabitBulder/config"
 	"context"
 	"fmt"
 	"log"
@@ -53,7 +53,7 @@ func InitRoutes() {
 func (h *Habit) Add() error {
 	key := fmt.Sprintf("habitMember:%d", 12)
 
-	err := DB.Rdb.HSet(context.Background(), key, h).Err()
+	err := config.Rdb.HSet(context.Background(), key, h).Err()
 	if err != nil {
 		return err
 	}

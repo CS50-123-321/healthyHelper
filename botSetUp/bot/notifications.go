@@ -1,0 +1,77 @@
+package bot
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"strconv"
+)
+
+// Daily reminder
+// Daily ranking
+// New joiners (say hi to x and y)
+// Custom /comman for fetching the Top Ranking ETC
+// Hero
+
+func LevelMessage(h Habit, percentageCompleted int) error {
+	var msg string
+	var gifURL string
+
+	switch {
+	case percentageCompleted == 100:
+		msg = fmt.Sprintf(
+			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
+			h.Name, h.HabitName)
+		gifURL = "https://media.giphy.com/media/l2Sq8sGtwGw0G7yW0/giphy.gif" 
+	case percentageCompleted == 60:
+		msg = fmt.Sprintf(
+			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
+			h.Name, h.HabitName)
+		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif" 
+	case percentageCompleted == 30:
+		msg = fmt.Sprintf(
+			"🌟 Great progress, *%s*! You've hit *30%%* of your habit **%s**! You're now a *Motivation Seeker*! Keep that momentum going! 💥",
+			h.Name, h.HabitName)
+		gifURL = "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif" 
+	case percentageCompleted == 10:
+		msg = fmt.Sprintf(
+			"✨ Nice start, *%s*! You've completed *10%%* of your habit **%s**! You're officially a *Rising Star*! Keep up the effort, you've got this! ⭐",
+			h.Name, h.HabitName)
+		gifURL = "https://media.giphy.com/media/l46CjFkIMsxw6fQ5K/giphy.gif"
+	}
+
+	if msg != "" {
+		// Send the message with bold formatting (MarkdownV2)
+		err := Remind(msg)
+		if err != nil {
+			return err
+		}
+		botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
+		// Send the GIF as an animation
+		err = sendGIF(botID, os.Getenv("TELE_TOKEN"), gifURL)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func sendGIF(chatID int, botToken string, gifURL string) error {
+	// Construct the Telegram API URL for sending the GIF
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo?chat_id=%d&video=%s", botToken, chatID, gifURL)
+
+	// Send the HTTP request
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		return fmt.Errorf("error sending GIF: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check if the request was successful
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to send GIF, status code: %d", resp.StatusCode)
+	}
+
+	return nil
+}
