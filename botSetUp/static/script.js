@@ -18,6 +18,7 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
 
         if (response.ok) {
             alert('Habit saved successfully!');
+            updateProgressBar(100); // Animates to full after successful form submission
         } else {
             alert('Error saving habit.');
         }
@@ -25,3 +26,8 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
         console.error('Error:', error);
     }
 });
+
+function updateProgressBar(percentage) {
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = `${percentage}%`;
+}

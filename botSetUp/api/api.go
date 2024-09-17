@@ -62,5 +62,4 @@ func GetUserBotID() {
 	})
 	log.Println("bot is running")
 	config.B.Start()
-
 }
