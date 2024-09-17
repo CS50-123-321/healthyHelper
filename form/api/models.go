@@ -6,11 +6,11 @@ type Habit struct {
 	CommitmentPeriodStr  string       `json:"commitmentPeriodStr" redis:"commitmentPeriodStr"`
 	CommitmentPeriod     int          `redis:"commitment_Period"`
 	TeleID               int64        `redis:"tele_id"`
-	Streaked             int64        `json:"streaked" redis:"streaked"`
+	Streaked             int64        `redis:"streaked"`
 	DaysLog              map[int]bool // calc
 	DaysLogByte          []byte       `redis:"days_log"`
 	NotificationLog      map[int]bool
 	NotificationLogBytes []byte `redis:"notification_log"`
-	TotalDays            int64  `redis:"total_days"`             // calc
-	TopHit               int    `json:"top_hit" redis:"top_hit"` // the highest dtreak reached.
+	TotalDays            int64  `redis:"total_days"` // calc
+	TopHit               int    `redis:"top_hit"`   // the highest dtreak reached.
 }

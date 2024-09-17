@@ -36,11 +36,11 @@ type Streak struct {
 type Habit struct {
 	Name                 string       `json:"name" redis:"name" binding:"required"`
 	HabitName            string       `json:"habitName" redis:"habit_name" binding:"required"`
-	CommitmentPeriodStr  string       `json:"commitmentPeriodStr"`
+	CommitmentPeriodStr  string       `json:"commitmentPeriod"`
 	CommitmentPeriod     int          `redis:"commitment_period"`
 	TeleID               int          `redis:"tele_id"`
-	Streaked             int          `json:"streaked" redis:"streaked"`
-	TopHit               int          `json:"top_hit" redis:"top_hit"` // the highest dtreak reached.
+	Streaked             int          `redis:"streaked"`
+	TopHit               int          `redis:"top_hit"` // the highest streak reached.
 	DaysLog              map[int]bool // calc
 	NotificationLog      map[int]bool
 	NotificationLogBytes []byte `redis:"notification_log"`

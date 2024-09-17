@@ -4,8 +4,10 @@ import (
 	"StreakHabitBulder/config"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -78,30 +80,7 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 }
 
 // This get called by the cron job to run daily and sets the day as false, it will be true if the member did sport.
-func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
-	h, err := getDaysRecord(key)
-	if err != nil {
-		log.Println("error getting days record: %v", err)
-		return nil
-	}
 
-	// Unmarshell it to the struct
-	err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)
-	if err != nil {
-		log.Println("error unmarshalling JSON: %v", err)
-		return nil
-	}
-
-	// Marking day as true
-	h.DaysLog[time.Now().Minute()] = false
-	h.DaysLogByte, err = json.Marshal(h.DaysLog)
-	if err != nil {
-		return nil
-	}
-	pipe.HSet(context.Background(), key, "days_log", h.DaysLogByte)
-	// New Joiner
-	return pipe
-}
 func SetNotificationLog(key string) error {
 	h, err := getDaysRecord(key)
 	if err != nil {
@@ -127,9 +106,33 @@ func SetNotificationLog(key string) error {
 	return config.Rdb.HSet(context.Background(), key, "notification_log", h.NotificationLogBytes).Err()
 
 }
+func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
+	h, err := getDaysRecord(key)
+	if err != nil {
+		log.Println("error getting days record: %v", err)
+		return nil
+	}
+
+	// Unmarshell it to the struct
+	err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)
+	if err != nil {
+		log.Println("error unmarshalling JSON: %v", err)
+		return nil
+	}
+
+	// Marking day as true
+	h.DaysLog[time.Now().Minute()] = false
+	h.DaysLogByte, err = json.Marshal(h.DaysLog)
+	if err != nil {
+		return nil
+	}
+	pipe.HSet(context.Background(), key, "days_log", h.DaysLogByte)
+	// New Joiner
+	return pipe
+}
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
-func Iterator() {
+func Act(userCase string) {
 	log.Println("Itratings")
 	teleIDS, err := getMembersIDs()
 	if err != nil {
@@ -140,7 +143,10 @@ func Iterator() {
 	pipe := config.Rdb.Pipeline()
 	for _, TId := range teleIDS {
 		var key = RK(TId)
-		pipe = SetOffDay(key, pipe)
+		if userCase == "SetDayOff" {
+			pipe = SetOffDay(key, pipe)
+		}
+
 		MembersCmdsMap[TId] = pipe.HGetAll(context.Background(), key)
 
 	}
@@ -157,4 +163,48 @@ func Iterator() {
 		}
 		MemberActiveDaysMap[teleID] = h
 	}
+	if userCase == "SendStatus" {
+		habitCalc(MemberActiveDaysMap)
+	}
+}
+
+func habitCalc(memberActiveDaysMap map[int]Habit) {
+	var highestStreakUser, highestTopHitUser Habit
+	var highestStreak, highestTopHit int
+	streakLeaderboard := []string{}
+
+	for _, habit := range memberActiveDaysMap {
+		// Track highest streak
+		if habit.Streaked > highestStreak {
+			highestStreak = habit.Streaked
+			highestStreakUser = habit
+		}
+		// Track highest top hit (i.e., total number of days)
+		if habit.TotalDays > highestTopHit {
+			highestTopHit = habit.TotalDays
+			highestTopHitUser = habit
+		}
+		// Add to streak leaderboard message (creative part)
+		streakLeaderboard = append(streakLeaderboard, fmt.Sprintf(
+			"🔥 %s is on a streak of %d days for habit **%s**!",
+			habit.Name, habit.Streaked, habit.HabitName))
+	}
+
+	// Creative overall message
+	topHitMsg := fmt.Sprintf(
+		"🏅 Highest Top Hit: %s has completed **%d** days of habit **%s**! 🚀",
+		highestTopHitUser.Name, highestTopHitUser.TotalDays, highestTopHitUser.HabitName)
+
+	streakMsg := fmt.Sprintf(
+		"🥇 Highest Streak: %s is on a **%d-day streak** for habit **%s**! Keep going! 🔥",
+		highestStreakUser.Name, highestStreakUser.Streaked, highestStreakUser.HabitName)
+
+	// Creative summary message
+	summaryMsg := "📊 Daily Habit Overview:\n" +
+		fmt.Sprintf("We’ve got some habit warriors making great progress today! 🌟\n") +
+		strings.Join(streakLeaderboard, "\n") + "\n\n" +
+		topHitMsg + "\n" + streakMsg
+
+	// Send the message
+	Remind(summaryMsg)
 }

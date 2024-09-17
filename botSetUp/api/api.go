@@ -1,6 +1,7 @@
 package api
 
 import (
+	"StreakHabitBulder/bot"
 	"StreakHabitBulder/config"
 	"log"
 	"net/http"
@@ -13,7 +14,7 @@ func InitRoutes() {
 	GetUserBotID()
 }
 func server(TId int64) {
-	var h *Habit
+	var h bot.Habit
 
 	// Initialize Gin router
 	router := gin.Default()
@@ -35,8 +36,8 @@ func server(TId int64) {
 			return
 		}
 		//Save the h data in Redis
-		h.TeleID = TId
-		err := h.Create()
+		h.TeleID = int(TId)
+		err := Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return

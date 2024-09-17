@@ -9,9 +9,8 @@ import (
 
 func InitCron() {
 	//every("*/1 * * * *", func() { bot.Remind("Minute Reminder!!!") }) // Runs every minute
-	every("0 7 * * *", func() { bot.Iterator() }) // Runs daily at 7 AM, set false for the day
-	//every("* * * * *", func() { bot.Iterator() })
-
+	every("0 7 * * *", func() { bot.Act("SetDayOff") }) // Runs daily at 7 AM, sends Analytics Message.
+	every("2 0 * * *", func() { bot.Act("SendStatus") })
 }
 
 func every(duration string, job func()) {

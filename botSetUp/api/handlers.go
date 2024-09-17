@@ -1,6 +1,7 @@
 package api
 
 import (
+	"StreakHabitBulder/bot"
 	"StreakHabitBulder/config"
 	"context"
 	"encoding/json"
@@ -10,7 +11,8 @@ import (
 	redis "github.com/redis/go-redis/v9"
 )
 
-func (h *Habit) Create() (err error) {
+func Create(h bot.Habit) (err error) {
+ 
 	switch h.CommitmentPeriodStr {
 	case "10 days":
 		h.CommitmentPeriod = 10
