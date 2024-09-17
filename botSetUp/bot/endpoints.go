@@ -11,7 +11,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-func BotInit() {
+func StartBot() {
 	StreakListner()
 }
 
@@ -47,6 +47,8 @@ func StreakListner() {
 		// handle when the user finished the period
 		if h.TotalDays == h.CommitmentPeriod {
 			log.Println("You have made it, set another challege and start again!!")
+			config.B.Reply(c.Message(), "You have made it, set another challege and start again!!")
+			return nil
 		}
 		err = config.Rdb.HSet(context.Background(), key, h).Err()
 		if err != nil {
@@ -57,10 +59,17 @@ func StreakListner() {
 		config.B.Reply(c.Message(), msg)
 		// setting The Current level and informing them.
 		dump := make(map[int]Habit)
+		err = json.Unmarshal(h.NotificationLogBytes, &h.NotificationLog)
+		if err != nil {
+			return err
+		}
 		dump[h.TeleID] = h
 		SetMemberLevel(dump)
 		return err
 	})
+	// config.B.Handle("/t", func(c tele.Context) (err error) {
+	// 	return c.Send("ds")
+	// })
 	log.Println("Listeners are running")
 	config.B.Start()
 }

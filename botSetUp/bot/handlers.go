@@ -68,7 +68,7 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 		if h.TotalDays == 1 {
 			percentageCompleted = 0
 		}
-		_, ok := h.NotificationLog[h.TeleID]
+		ok := h.NotificationLog[time.Now().Minute()]
 		if !ok { // Send notification only if the user hasn't recevied a notification on this day.
 			LevelMessage(h, percentageCompleted)
 		} else {
@@ -115,11 +115,11 @@ func SetNotificationLog(key string) error {
 		log.Println("error unmarshalling JSON: %v", err)
 		return nil
 	}
-	dum := make(map[int]bool)
-
 	// Marking day as true
+	dum := make(map[int]bool)
 	dum[time.Now().Minute()] = true
 	h.NotificationLog = dum
+
 	h.NotificationLogBytes, err = json.Marshal(h.NotificationLog)
 	if err != nil {
 		return nil
