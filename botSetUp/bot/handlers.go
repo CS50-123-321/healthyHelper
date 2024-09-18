@@ -70,7 +70,7 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 		if h.TotalDays > 0 {
 			percentageCompleted = (h.TotalDays * 100 / h.CommitmentPeriod)
 		}
-		ok := h.NotificationLog[time.Now().Minute()]
+		ok := h.NotificationLog[time.Now().Day()]
 		if !ok { // Send notification only if the user hasn't recevied a notification on this day.
 			LevelMessage(h, percentageCompleted)
 		} else {
@@ -96,7 +96,7 @@ func SetNotificationLog(key string) error {
 	}
 	// Marking day as true
 	dum := make(map[int]bool)
-	dum[time.Now().Minute()] = true
+	dum[time.Now().Day()] = true
 	h.NotificationLog = dum
 
 	h.NotificationLogBytes, err = json.Marshal(h.NotificationLog)
@@ -121,7 +121,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 	}
 
 	// Marking day as true
-	h.DaysLog[time.Now().Minute()] = false
+	h.DaysLog[time.Now().Day()] = false
 	h.DaysLogByte, err = json.Marshal(h.DaysLog)
 	if err != nil {
 		return nil
@@ -132,7 +132,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 }
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
-func Act(userCase string) {
+func Act(useCase string) {
 	log.Println("Itratings")
 	teleIDS, err := getMembersIDs()
 	if err != nil {
@@ -143,7 +143,7 @@ func Act(userCase string) {
 	pipe := config.Rdb.Pipeline()
 	for _, TId := range teleIDS {
 		var key = RK(TId)
-		if userCase == "SetDayOff" {
+		if useCase == "SetDayOff" {
 			pipe = SetOffDay(key, pipe)
 		}
 
@@ -163,7 +163,7 @@ func Act(userCase string) {
 		}
 		MemberActiveDaysMap[teleID] = h
 	}
-	if userCase == "SendStatus" {
+	if useCase == "SendStatus" {
 		habitCalc(MemberActiveDaysMap)
 	}
 }

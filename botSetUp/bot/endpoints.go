@@ -32,7 +32,7 @@ func StreakListner() {
 			return fmt.Errorf("error unmarshalling JSON: %v", err)
 		}
 		// Marking day as true
-		h.DaysLog[time.Now().Minute()] = true
+		h.DaysLog[time.Now().Day()] = true
 
 		h.DaysLogByte, err = json.Marshal(h.DaysLog)
 		if err != nil {
