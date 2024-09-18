@@ -1,32 +1,35 @@
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #67b26f, #4ca2cd);
+    background: linear-gradient(135deg, #FFEFBA, #FFFFFF);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    color: #333;
 }
 
 .form-container {
-    background-color: #fff;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 350px;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
     text-align: center;
 }
 
 h2 {
-    color: #4ca2cd;
+    color: #FF8C42;
+    font-weight: 600;
     margin-bottom: 10px;
 }
 
 .tagline {
     font-size: 14px;
-    color: #67b26f;
-    margin-bottom: 20px;
+    color: #A0A0A0;
+    margin-bottom: 25px;
 }
 
 .form-group {
@@ -43,26 +46,38 @@ label {
 
 input, select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 12px;
+    border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #FF8C42;
+    outline: none;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    background-color: #4ca2cd;
+    background-color: #FF8C42;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background-color: #67b26f;
+    background-color: #FF7043;
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar-container {
@@ -77,7 +92,45 @@ button:hover {
 .progress-bar {
     height: 100%;
     width: 0;
-    background-color: #4ca2cd;
+    background-color: #FF8C42;
     transition: width 0.4s ease;
     border-radius: 5px;
+}
+
+.success-message {
+    display: none; /* Hidden by default */
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb; /* Light green border */
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.success-message.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.success-message.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+    display: none;
+}
+
+.success-message i {
+    margin-right: 10px;
+    color: #28a745; /* Darker green for the icon */
+}
+
+@media (max-width: 600px) {
+    .form-container {
+        width: 90%;
+        padding: 20px;
+    }
 }

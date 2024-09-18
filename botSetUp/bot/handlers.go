@@ -66,9 +66,9 @@ func getMembersIDs() (ids []int, err error) {
 
 func SetMemberLevel(memberHabit map[int]Habit) {
 	for _, h := range memberHabit {
-		percentageCompleted := (h.TotalDays * 100 / h.CommitmentPeriod)
-		if h.TotalDays == 1 {
-			percentageCompleted = 0
+		percentageCompleted := 0
+		if h.TotalDays > 0 {
+			percentageCompleted = (h.TotalDays * 100 / h.CommitmentPeriod)
 		}
 		ok := h.NotificationLog[time.Now().Minute()]
 		if !ok { // Send notification only if the user hasn't recevied a notification on this day.

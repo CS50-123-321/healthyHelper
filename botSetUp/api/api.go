@@ -24,13 +24,18 @@ func server(TId int64) {
 
 	// Serve the index.html file at the root ("/")
 	router.GET("", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{
+		c.HTML(http.StatusOK, "welcome.html", gin.H{
 			"books": "books",
 		})
 	})
 
+	router.GET("/create-habit", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"books": "books",
+		})
+	})
 	// Define the route to handle habit form submissions
-	router.POST("/save-habit", func(c *gin.Context) {
+	router.POST("/create-habit", func(c *gin.Context) {
 		if err := c.ShouldBindJSON(&h); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -45,6 +50,28 @@ func server(TId int64) {
 		c.JSON(http.StatusOK, gin.H{"result": h})
 		config.B.Close()
 		log.Println("stopping the bot")
+	})
+
+	router.GET("/progress", func(c *gin.Context) {
+		var p ProgresRequest
+		// err := c.ShouldBindQuery(&p)
+		// if err != nil {
+		// 	log.Println(err)
+		// 	return
+		// }
+		p.TeleID = 175864127
+
+		err, h := getUserProgress(p.TeleID)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch user progress"})
+			return
+		}
+		// Pass 'h' (habit data) to the template
+		c.HTML(http.StatusOK, "progress.html", gin.H{
+			"Habit": h,
+		})
+
 	})
 
 	if err := router.Run(":9000"); err != nil {

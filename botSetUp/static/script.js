@@ -8,7 +8,7 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
     };
 
     try {
-        const response = await fetch('/save-habit', {
+        const response = await fetch('/create-habit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -16,11 +16,22 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
             body: JSON.stringify(formData)
         });
 
+        const successMessage = document.getElementById('successMessage');
+
         if (response.ok) {
-            alert('Habit saved successfully!');
             updateProgressBar(100); // Animates to full after successful form submission
+
+            // Show the success message
+            successMessage.classList.remove('hide');
+            successMessage.classList.add('show');
+
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                successMessage.classList.add('hide');
+            }, 3000); // Hide after 3 seconds
         } else {
-            alert('Error saving habit.');
+            // Optional: handle error case if needed
+            console.error('Error saving habit.');
         }
     } catch (error) {
         console.error('Error:', error);

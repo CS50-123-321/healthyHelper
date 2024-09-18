@@ -6,20 +6,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	redis "github.com/redis/go-redis/v9"
 )
 
 func Create(h bot.Habit) (err error) {
- 
-	switch h.CommitmentPeriodStr {
-	case "10 days":
-		h.CommitmentPeriod = 10
-	case "20 days":
-		h.CommitmentPeriod = 20
-	case "30 days":
-		h.CommitmentPeriod = 30
+
+	h.CommitmentPeriod, err = strconv.Atoi(h.CommitmentPeriodStr)
+	if err != nil {
+		return
 	}
 
 	h.DaysLog = make(map[int]bool)
@@ -31,7 +28,7 @@ func Create(h bot.Habit) (err error) {
 	if err != nil {
 		return err
 	}
-	h.NotificationLogBytes, err = json.Marshal(h.DaysLog)
+	h.NotificationLogBytes, err = json.Marshal(h.NotificationLog)
 	if err != nil {
 		return err
 	}
@@ -72,5 +69,9 @@ func Create(h bot.Habit) (err error) {
 	// 	return
 	// }
 	// log.Println(t)
+	return
+}
+func getUserProgress(teleId int) (err error, h bot.Habit) {
+	err = config.Rdb.HGetAll(context.Background(), bot.RK(teleId)).Scan(&h)
 	return
 }

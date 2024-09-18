@@ -9,32 +9,38 @@
 <body>
 
 <div class="form-container">
-    <h2>Commit to a Better You!</h2>
-    <p class="tagline">Build lasting habits, one day at a time. Start now.</p>
+    <h2>Commit to a Better You</h2>
+    <p class="tagline">Achieve your goals, one step at a time.</p>
     <form id="habitForm">
         <div class="form-group">
-            <label for="name">Your Name</label>
+            <label for="name"><i class="fas fa-user"></i> Your Name</label>
             <input type="text" id="name" name="name" placeholder="Enter your name" required>
         </div>
         <div class="form-group">
-            <label for="habitName">What's Your Habit?</label>
-            <input type="text" id="habitName" name="habitName" placeholder="e.g. 10-minute daily meditation" required>
+            <label for="habitName"><i class="fas fa-tasks"></i> What's Your Habit?</label>
+            <input type="text" id="habitName" name="habitName" placeholder="e.g. Daily Exercise" required>
         </div>
         <div class="form-group">
-            <label for="commitmentPeriod">How Long Will You Commit?</label>
+            <label for="commitmentPeriod"><i class="fas fa-calendar-alt"></i> Commitment Period</label>
             <select id="commitmentPeriod" name="commitmentPeriod" required>
                 <option value="10">10 days</option>
                 <option value="20">20 days</option>
                 <option value="30">30 days</option>
             </select>
         </div>
-        <button type="submit">Start Your Journey</button>
+        <button type="submit">Start Journey</button>
+        
     </form>
     <div class="progress-bar-container">
         <div class="progress-bar" id="progressBar"></div>
     </div>
+
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> Habit saved successfully!
+    </div>
 </div>
 
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/static/script.js"></script>
 
 </body>
