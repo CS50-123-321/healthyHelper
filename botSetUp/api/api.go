@@ -24,7 +24,7 @@ func server(TId int64) {
 
 	// Serve the index.html file at the root ("/")
 	router.GET("", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "welcome.html", gin.H{
+		c.HTML(http.StatusOK, "index.html", gin.H{
 			"books": "books",
 		})
 	})

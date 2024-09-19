@@ -42,6 +42,7 @@ func StreakListner() {
 		if h.TopHit == 0 {
 			h.TotalDays = 0
 			h.Streaked = 0
+			LevelMessage(h, 0)
 			return config.Rdb.HSet(context.Background(), key, h).Err()
 		}
 		// handle when the user finished the period

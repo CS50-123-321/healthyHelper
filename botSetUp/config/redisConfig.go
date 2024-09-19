@@ -16,9 +16,10 @@ var (
 func InitRedis() *redis.Client {
 	isTesting := os.Getenv("Testing")
 	if isTesting == "false" {
-		opts, err := redis.ParseURL(os.Getenv("REDIS_LOCALHOST"))
+		opts, err := redis.ParseURL(os.Getenv("REDIS_FLY"))
 		if err != nil {
-			panic(err)
+			log.Println("InitRedis err", err)
+			return nil
 		}
 		Rdb = redis.NewClient(opts)
 	} else {

@@ -11,10 +11,10 @@ primary_region = 'ist'
     GO_VERSION = '1.21.4'
 
 [env]
-  PORT = '8080'
+  PORT = '9000'
 
 [http_service]
-  internal_port = 8080
+  internal_port = 9000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true

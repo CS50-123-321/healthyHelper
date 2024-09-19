@@ -19,7 +19,7 @@ func InitTele() {
 	var err error
 	B, err = tele.NewBot(pref)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("InitTele err: ", err)
 		return
 	}
 
