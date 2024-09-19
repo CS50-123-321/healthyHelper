@@ -67,11 +67,12 @@ func getMembersIDs() (ids []int, err error) {
 func SetMemberLevel(memberHabit map[int]Habit) {
 	for _, h := range memberHabit {
 		percentageCompleted := 0
-		if h.TotalDays > 0 {
+		if h.TotalDays > 1 {
 			percentageCompleted = (h.TotalDays * 100 / h.CommitmentPeriod)
 		}
 		ok := h.NotificationLog[time.Now().Day()]
 		if !ok { // Send notification only if the user hasn't recevied a notification on this day.
+
 			LevelMessage(h, percentageCompleted)
 		} else {
 			log.Println("this user has been informed today already")
@@ -164,7 +165,12 @@ func Act(useCase string) {
 		MemberActiveDaysMap[teleID] = h
 	}
 	if useCase == "SendStatus" {
+		log.Println("sending status to everyone")
 		habitCalc(MemberActiveDaysMap)
+	}
+	if useCase == "ShitOn" {
+		log.Println("shitting..s")
+		ShitGenerator(MemberActiveDaysMap)
 	}
 }
 
@@ -204,7 +210,25 @@ func habitCalc(memberActiveDaysMap map[int]Habit) {
 		fmt.Sprintf("We’ve got some habit warriors making great progress today! 🌟\n") +
 		strings.Join(streakLeaderboard, "\n") + "\n\n" +
 		topHitMsg + "\n" + streakMsg
-
 	// Send the message
 	Remind(summaryMsg)
+}
+
+func ShitGenerator(memberActiveDaysMap map[int]Habit) {
+	for _, h := range memberActiveDaysMap {
+		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		done, ok := h.DaysLog[time.Now().Day()]
+		log.Println(ok, done)
+		if ok && !done {
+			msg := fmt.Sprintf(
+				"💩💩💩 %s 💩💩💩\n"+
+					"You missed today, Don't let it become a stinker tomorrow! 🚀",
+				h.Name)
+			Remind(msg)
+		}
+	}
 }

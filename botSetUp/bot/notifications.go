@@ -23,17 +23,17 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
 			h.Name, h.HabitName)
 		gifURL = "https://vsgif.com/gif/3553131"
-	case percentageCompleted == 60:
+	case percentageCompleted == 80:
 		msg = fmt.Sprintf(
 			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
 			h.Name, h.HabitName)
 		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif"
-	case percentageCompleted == 30:
+	case percentageCompleted == 40:
 		msg = fmt.Sprintf(
 			"🌟 Great progress, *%s*! You've hit *30%%* of your habit **%s**! You're now a *Motivation Seeker*! Keep that momentum going! 💥",
 			h.Name, h.HabitName)
 		gifURL = "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"
-	case percentageCompleted == 10:
+	case percentageCompleted == 20:
 		msg = fmt.Sprintf(
 			"✨ Nice start, *%s*! You've completed *10%%* of your habit **%s**! You're officially a *Rising Star*! Keep up the effort, you've got this! ⭐",
 			h.Name, h.HabitName)
@@ -59,7 +59,7 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 		}
 		// Send the message with bold formatting (MarkdownV2)
 		err = Remind(msg)
-		if err != nil {
+	if err != nil {
 			return err
 		}
 		botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
