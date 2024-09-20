@@ -25,6 +25,8 @@ func StreakListner() {
 		if err != nil {
 			return fmt.Errorf("error getting days record: %v", err)
 		}
+		// LevelMessage(h, 100)
+		// return
 
 		// Unmarshell it to the struct
 		err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)

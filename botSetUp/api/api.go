@@ -11,10 +11,11 @@ import (
 )
 
 func InitRoutes() {
-	GetUserBotID()
+	LunchMiniApp()
 }
 func server(TId int64) {
 	var h bot.Habit
+	var err error
 
 	// Initialize Gin router
 	router := gin.Default()
@@ -24,12 +25,14 @@ func server(TId int64) {
 
 	// Serve the index.html file at the root ("/")
 	router.GET("", func(c *gin.Context) {
+		log.Println("Get / context:", c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"books": "books",
 		})
 	})
 
 	router.GET("/create-habit", func(c *gin.Context) {
+		log.Println("GET /create-habit context:", c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"books": "books",
 		})
@@ -42,7 +45,7 @@ func server(TId int64) {
 		}
 		//Save the h data in Redis
 		h.TeleID = int(TId)
-		err := Create(h)
+		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
@@ -59,7 +62,7 @@ func server(TId int64) {
 		// 	log.Println(err)
 		// 	return
 		// }
-		p.TeleID = 175864127
+		//p.TeleID = 175864127
 
 		err, h := getUserProgress(p.TeleID)
 		if err != nil {
@@ -79,12 +82,26 @@ func server(TId int64) {
 	}
 
 }
-func GetUserBotID() {
+func LunchMiniApp() {
+	inlineBtn := tele.InlineButton{
+		Text:   "Open Mini App!",
+		WebApp: &tele.WebApp{URL: "https://familycody.fly.dev"},
+	}
+
+	inlineKeys := [][]tele.InlineButton{
+		{tele.InlineButton(inlineBtn)},
+	}
+
+	// Set up a handler for messages to send the button
 	config.B.Handle("/start", func(c tele.Context) error {
-		c.Send("Click Join!!")
-		server(c.Sender().ID)
+		return c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
+	})
+	// Handle callback queries when the button is clicked
+	config.B.Handle(&inlineBtn, func(c tele.Context) error {
+		user := c.Sender() // Get the user who clicked the button
+		userID := user.ID
+		server(userID)
 		config.B = nil
-		log.Println("stopping the bot")
 		return nil
 	})
 	log.Println("bot is running")

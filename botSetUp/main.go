@@ -1,15 +1,16 @@
 package main
 
 import (
-	exec "StreakHabitBulder/exec"
+	"StreakHabitBulder/exec"
 	"log"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+
 	log.Println("Server is running!")
 	godotenv.Load()
 	exec.Init()
-
 }

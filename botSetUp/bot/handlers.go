@@ -169,7 +169,7 @@ func Act(useCase string) {
 		habitCalc(MemberActiveDaysMap)
 	}
 	if useCase == "ShitOn" {
-		log.Println("shitting..s")
+		log.Println("shitting..")
 		ShitGenerator(MemberActiveDaysMap)
 	}
 }
@@ -222,7 +222,6 @@ func ShitGenerator(memberActiveDaysMap map[int]Habit) {
 			return
 		}
 		done, ok := h.DaysLog[time.Now().Day()]
-		log.Println(ok, done)
 		if ok && !done {
 			msg := fmt.Sprintf(
 				"💩💩💩 %s 💩💩💩\n"+
