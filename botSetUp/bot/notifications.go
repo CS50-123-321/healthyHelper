@@ -49,13 +49,22 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 				"We're excited to have you on board for your new habit: **%s**! 💪\n"+
 				"You've committed to building this habit for the next **%d days**. 🗓️\n\n"+
 				"Stay strong and consistent, and we know you'll crush it! 🚀\n"+
-				"Track your progress, stay motivated, and feel free to share your journey with the group! We're all cheering for you! 🙌✨\n\n",
+				"Track your progress, stay motivated, and feel free to share your journey with the group! We're all cheering for you! 🙌✨\n\n"+
+				// Adding a space between the English and Arabic sections
+				"\n\n"+
+				"🎉 مرحبًا، *%s*! 🎉\n\n"+
+				"يسعدنا انضمامك إلى عادتك الجديدة: **%s**! 💪\n"+
+				"لقد التزمت ببناء هذه العادة خلال **%d من الأيام القادمة**. 🗓\n\n"+
+				"ابق قويًا وثابتًا، ونحن نعلم أنك ستفوز! 🚀\n"+
+				"تابع تقدمك، وحافظ على تحفيزك، ولا تتردد في مشاركة رحلتك مع المجموعة! نحن جميعًا نشجعك! 🙌✨\n\n",
+			h.Name,
+			h.HabitName,
+			h.CommitmentPeriod,
 			h.Name,
 			h.HabitName,
 			h.CommitmentPeriod,
 		)
 	}
-
 	if msg != "" {
 		// Setting the sent notigication true to avoid oversending msgs.
 		err := SetNotificationLog(RK(h.TeleID))

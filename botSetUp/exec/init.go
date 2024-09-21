@@ -33,8 +33,14 @@ func waitGroup() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		fmt.Println("singing form is running")
-		api.InitRoutes()
+		fmt.Println("running server")
+		api.Server()
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("Lunching mini app")
+		api.LunchMiniApp()
 	}()
 	wg.Wait()
 }

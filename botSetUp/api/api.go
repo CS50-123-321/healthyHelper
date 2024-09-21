@@ -3,21 +3,20 @@ package api
 import (
 	"StreakHabitBulder/bot"
 	"StreakHabitBulder/config"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	tele "gopkg.in/telebot.v3"
 )
 
-func InitRoutes() {
-	LunchMiniApp()
-}
-func server(TId int64) {
+func Server() {
 	var h bot.Habit
 	var err error
-
 	// Initialize Gin router
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
 	router.LoadHTMLGlob("static/*")
@@ -25,14 +24,12 @@ func server(TId int64) {
 
 	// Serve the index.html file at the root ("/")
 	router.GET("", func(c *gin.Context) {
-		log.Println("Get / context:", c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"books": "books",
 		})
 	})
 
 	router.GET("/create-habit", func(c *gin.Context) {
-		log.Println("GET /create-habit context:", c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"books": "books",
 		})
@@ -44,14 +41,17 @@ func server(TId int64) {
 			return
 		}
 		//Save the h data in Redis
-		h.TeleID = int(TId)
+		h.TeleID, err = strconv.Atoi(h.TeleIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing session ID"})
+			return
+		}
 		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"result": h})
-		config.B.Close()
 		log.Println("stopping the bot")
 	})
 
@@ -76,34 +76,43 @@ func server(TId int64) {
 		})
 
 	})
-
-	if err := router.Run(":9000"); err != nil {
+	log.Println("Listening on port 0.0.0.0:8888")
+	if err := router.Run("0.0.0.0:8888"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
 }
-func LunchMiniApp() {
-	inlineBtn := tele.InlineButton{
-		Text:   "Open Mini App!",
-		WebApp: &tele.WebApp{URL: "https://familycody.fly.dev"},
-	}
 
-	inlineKeys := [][]tele.InlineButton{
-		{tele.InlineButton(inlineBtn)},
-	}
+func LunchMiniApp() {
+	log.Println("bot is running")
 
 	// Set up a handler for messages to send the button
 	config.B.Handle("/start", func(c tele.Context) error {
-		return c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
-	})
-	// Handle callback queries when the button is clicked
-	config.B.Handle(&inlineBtn, func(c tele.Context) error {
-		user := c.Sender() // Get the user who clicked the button
-		userID := user.ID
-		server(userID)
+		log.Println("bot is running")
+		// Create the button with the session ID as a URL parameter
+		webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", c.Sender().ID)
+		inlineBtn := tele.InlineButton{
+			Text:   "Open Mini App!",
+			WebApp: &tele.WebApp{URL: webAppURL},
+		}
+
+		inlineKeys := [][]tele.InlineButton{
+			{inlineBtn},
+		}
+		log.Println("url:", webAppURL)
+		//c.Send("url :", webAppURL)
+		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		config.B = nil
+		log.Println("Stopping the bot")
 		return nil
 	})
-	log.Println("bot is running")
+	// Handle callback queries when the button is clicked
+	// config.B.Handle(&inlineBtn, func(c tele.Context) error {
+	// 	user := c.Sender() // Get the user who clicked the button
+	// 	userID := user.ID
+
+	// 	log.Println("Stopping the bot")
+	// 	return nil
+	// })
 	config.B.Start()
 }

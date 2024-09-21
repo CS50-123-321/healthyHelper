@@ -1,24 +1,33 @@
-document.getElementById('habitForm').addEventListener('submit', async function(event) {
+// Extract the session ID from the URL
+function getSessionID() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('session');
+}
+
+const sessionID = getSessionID(); 
+
+document.getElementById('habitForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const formData = {
         name: document.getElementById('name').value,
-        habitName: document.getElementById('habitName').value,
-        commitmentPeriod: document.getElementById('commitmentPeriod').value
-    };
+        habit_name: document.getElementById('habit_name').value,
+        commitment_Period: document.getElementById('commitment_Period').value,
+        tele_id: sessionID 
 
+    };
     try {
         const response = await fetch('/create-habit', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json', // Ensure this matches what your server expects
             },
             body: JSON.stringify(formData)
         });
 
-        const successMessage = document.getElementById('successMessage');
-
+        // Handle the server response
         if (response.ok) {
+            const successMessage = document.getElementById('successMessage');
             updateProgressBar(100); // Animates to full after successful form submission
 
             // Show the success message
@@ -30,7 +39,7 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
                 successMessage.classList.add('hide');
             }, 3000); // Hide after 3 seconds
         } else {
-            // Optional: handle error case if needed
+            // Handle error case if needed
             console.error('Error saving habit.');
         }
     } catch (error) {
@@ -38,6 +47,7 @@ document.getElementById('habitForm').addEventListener('submit', async function(e
     }
 });
 
+// Function to update the progress bar (can be used after form submission)
 function updateProgressBar(percentage) {
     const progressBar = document.getElementById('progressBar');
     progressBar.style.width = `${percentage}%`;

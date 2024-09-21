@@ -25,8 +25,11 @@ func StreakListner() {
 		if err != nil {
 			return fmt.Errorf("error getting days record: %v", err)
 		}
-		// LevelMessage(h, 100)
-		// return
+		if h.TeleID == 0 {
+			msg := fmt.Sprintf("%v hasn't made a habit to commit to", c.Sender().FirstName)
+			config.B.Reply(c.Message(), msg)
+			return fmt.Errorf("this teleID doesn''t exsist in redis: %v", err)
+		}
 
 		// Unmarshell it to the struct
 		err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)

@@ -24,6 +24,7 @@ func Create(h bot.Habit) (err error) {
 	h.TotalDays = 0
 	h.TopHit = 0
 	h.Streaked = 0
+	h.CreatedAt = time.Now()
 	daysLogJSON, err := json.Marshal(h.DaysLog)
 	if err != nil {
 		return err
@@ -43,6 +44,7 @@ func Create(h bot.Habit) (err error) {
 		"total_days":        h.TotalDays,
 		"top_hit":           h.TopHit,
 		"notification_log":  h.NotificationLogBytes,
+		"created_at":        h.CreatedAt,
 	}).Err()
 	if err != nil {
 		return err
