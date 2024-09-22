@@ -86,7 +86,6 @@ func Server() {
 func LunchMiniApp() {
 	log.Println("bot is running")
 
-	// Set up a handler for messages to send the button
 	config.B.Handle("/start", func(c tele.Context) error {
 		log.Println("bot is running")
 		// Create the button with the session ID as a URL parameter
@@ -110,7 +109,6 @@ func LunchMiniApp() {
 
 		// Send the habit information separately
 		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
-		//config.B = nil
 		log.Println("Stopping the bot")
 		return nil
 	})
