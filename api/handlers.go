@@ -24,7 +24,6 @@ func Create(h bot.Habit) (err error) {
 		now := time.Now()
 		day := now.AddDate(0, 0, i).Day()		
 		h.DaysLog[day] = false
-
 	}
 	h.NotificationLog = h.DaysLog // init for daysLog and NotificationLog
 	h.TotalDays = 0
@@ -63,8 +62,8 @@ func Create(h bot.Habit) (err error) {
 	if err != nil {
 		return err
 	}
-	msg := fmt.Sprintf("Yay🎉🎉, new habit maker joiner, welcome 🎉%v🎉, Habit: %v", h.Name, h.HabitName)
-	bot.Remind(msg)
+	//msg := fmt.Sprintf("Yay🎉🎉, new habit maker joiner, welcome 🎉%v🎉, Habit: %v", h.Name, h.HabitName)
+	//bot.Remind(msg)
 	return
 }
 func getUserProgress(teleId int) (err error, h bot.Habit) {
