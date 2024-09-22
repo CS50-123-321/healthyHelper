@@ -57,11 +57,11 @@ func Server() {
 
 	router.GET("/progress", func(c *gin.Context) {
 		var p ProgresRequest
-		// err := c.ShouldBindQuery(&p)
-		// if err != nil {
-		// 	log.Println(err)
-		// 	return
-		// }
+		err := c.ShouldBindJSON(&p)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 		//p.TeleID = 175864127
 
 		err, h := getUserProgress(p.TeleID)
@@ -98,27 +98,28 @@ func LunchMiniApp() {
 		inlineKeys := [][]tele.InlineButton{
 			{inlineBtn},
 		}
-		//check if the user has a habit made before or not
-		// h, err := GetHabit(int(c.Sender().ID))
-		// if err != nil {
-		// 	return err
-		// }
-		// if h.TeleID != 0 {
-		// 	c.Send(fmt.Sprintf("You already have a habit: %v", h))
-		// }
-
 		// Send the habit information separately
 		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		log.Println("Stopping the bot")
 		return nil
 	})
-	// Handle callback queries when the button is clicked
-	// config.B.Handle(&inlineBtn, func(c tele.Context) error {
-	// 	user := c.Sender() // Get the user who clicked the button
-	// 	userID := user.ID
-	// 	log.Println("Stopping the bot")
-	// 	return nil
-	// })
+	config.B.Handle("/Me", func(c tele.Context) error {
+		log.Println("bot is running")
+		// Create the button with the session ID as a URL parameter
+		webAppURL := fmt.Sprintf("https://familycody.fly.dev/progress?tele_id=%d", c.Sender().ID)
+		inlineBtn := tele.InlineButton{
+			Text:   "Your Progress!",
+			WebApp: &tele.WebApp{URL: webAppURL},
+		}
+
+		inlineKeys := [][]tele.InlineButton{
+			{inlineBtn},
+		}
+		// Send the habit information separately
+		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
+		return nil
+	})
+
 	config.B.Start()
 }
 

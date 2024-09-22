@@ -1,4 +1,5 @@
 package api
+
 type ProgresRequest struct {
-    TeleID int `form:"teleID" binding:"required"`
+	TeleID int `json:"tele_id" binding:"required"`
 }
