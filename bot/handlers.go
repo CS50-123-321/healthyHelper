@@ -231,8 +231,9 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 		} else if ok && done {
 			msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", h.Name)
 		}
-		Remind(msg)
-
+		if msg != " " {
+			Remind(msg)
+		}
 	}
 }
 

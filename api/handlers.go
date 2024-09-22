@@ -20,7 +20,10 @@ func Create(h bot.Habit) (err error) {
 	}
 
 	h.DaysLog = make(map[int]bool)
-	h.NotificationLog = make(map[int]bool)
+	for i := 1; i < h.CommitmentPeriod; i++ {
+		h.DaysLog[i] = false
+	}
+	h.NotificationLog = h.DaysLog // init for daysLog and NotificationLog
 	h.TotalDays = 0
 	h.TopHit = 0
 	h.Streaked = 0
