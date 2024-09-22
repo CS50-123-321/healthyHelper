@@ -168,9 +168,9 @@ func Act(useCase string) {
 		log.Println("sending status to everyone")
 		habitCalc(MemberActiveDaysMap)
 	}
-	if useCase == "ShitOn" {
-		log.Println("shitting..")
-		ShitGenerator(MemberActiveDaysMap)
+	if useCase == "dailyWatch" {
+		log.Println("dailyWatch..")
+		DailyWatch(MemberActiveDaysMap)
 	}
 }
 
@@ -214,21 +214,25 @@ func habitCalc(memberActiveDaysMap map[int]Habit) {
 	Remind(summaryMsg)
 }
 
-func ShitGenerator(memberActiveDaysMap map[int]Habit) {
+func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	for _, h := range memberActiveDaysMap {
 		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+		var msg string
 		done, ok := h.DaysLog[time.Now().Day()]
 		if ok && !done {
-			msg := fmt.Sprintf(
+			msg = fmt.Sprintf(
 				"💩💩💩 %s 💩💩💩\n"+
 					"You missed today, Don't let it become a stinker tomorrow! 🚀",
 				h.Name)
-			Remind(msg)
+		} else if ok && done {
+			msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", h.Name)
 		}
+		Remind(msg)
+
 	}
 }
 
@@ -248,6 +252,6 @@ func GetHabitLevel(completionPercentage int) string {
 	case completionPercentage >= 20:
 		return "Rising Star 🌟"
 	default:
-		return "New Challenger🌱"// 0% level
+		return "New Challenger🌱" // 0% level
 	}
 }

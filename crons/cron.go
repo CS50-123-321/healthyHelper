@@ -9,11 +9,11 @@ import (
 
 func InitCron() {
 	//every("*/1 * * * *", func() { bot.Remind("Minute Reminder!!!") }) // Runs every minute
-	every("15 8 * * *", func() { bot.Act("SetDayOff") })                    // Runs daily at 7 AM, sends Analytics Message.
-	every("15 8 * * *", func() { bot.Remind("مو تنسون تسوون رياضة اليوم") }) // Runs daily at 7 AM, sends Analytics Message.
-	every("0 19 * * *", func() { bot.Act("SendStatus") })                   // Send at 7 PM daily
-	every("0 22 * * *", func() { bot.Act("ShitOn") })                       // Send at 1- PM daily, easu, shit on the members who don't stick to the habit!! "0 22 * * *"
-}
+	every("15 5 * * *", func() { bot.Act("SetDayOff") })                  // 8:15 AM Baghdad time
+	every("15 5 * * *", func() { bot.Remind("مو تنسون تسوون رياضة اليوم") }) // 8:15 AM Baghdad time
+	every("0 16 * * *", func() { bot.Act("SendStatus") })                 // 7:00 PM Baghdad time
+	every("0 18 * * *", func() { bot.Act("dailyWatch") })                 // 10:00 PM Baghdad time
+	}
 
 func every(duration string, job func()) {
 	c := cron.New()
