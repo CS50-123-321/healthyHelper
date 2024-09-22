@@ -57,20 +57,8 @@ func Create(h bot.Habit) (err error) {
 	if err != nil {
 		return err
 	}
-
-	// //TODO: notify
-	// msg := fmt.Sprintf("%v, %v", h, h.TeleID)
-	// botID, err := strconv.Atoi(os.Getenv("TestingBotID"))
-	// if err != nil {
-	// 	log.Println("err:", err)
-	// 	return
-	// }
-	// t, err := config.B.Send(tele.ChatID(botID), msg)
-	// if err != nil {
-	// 	log.Println("err:", err)
-	// 	return
-	// }
-	// log.Println(t)
+	msg := fmt.Sprintf("Yay🎉🎉, new habit maker joiner, welcome 🎉%v🎉, Habit: %v", h.Name, h.HabitName)
+	bot.Remind(msg)
 	return
 }
 func getUserProgress(teleId int) (err error, h bot.Habit) {

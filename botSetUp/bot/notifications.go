@@ -13,15 +13,15 @@ import (
 // Custom /comman for fetching the Top Ranking ETC
 // Hero
 
-func LevelMessage(h Habit, percentageCompleted int) error {
+func LevelMessage(h Habit, percentageCompleted int) (err error) {
 	var msg string
 	var gifURL string
-
 	switch {
 	case percentageCompleted == 100:
 		msg = fmt.Sprintf(
 			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
 			h.Name, h.HabitName)
+		
 		gifURL = "https://vsgif.com/gif/3553131"
 		// _, err := certificate.GenerateCertificate(h)
 		// if err != nil {
@@ -33,6 +33,7 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
 			h.Name, h.HabitName)
 		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif"
+
 	case percentageCompleted == 40:
 		msg = fmt.Sprintf(
 			"🌟 Great progress, *%s*! You've hit *30%%* of your habit **%s**! You're now a *Motivation Seeker*! Keep that momentum going! 💥",
@@ -64,23 +65,24 @@ func LevelMessage(h Habit, percentageCompleted int) error {
 			h.HabitName,
 			h.CommitmentPeriod,
 		)
+
 	}
 	if msg != "" {
 		// Setting the sent notigication true to avoid oversending msgs.
 		err := SetNotificationLog(RK(h.TeleID))
 		if err != nil {
-			return err
+			return  err
 		}
 		// Send the message with bold formatting (MarkdownV2)
 		err = Remind(msg)
 		if err != nil {
-			return err
+			return  err
 		}
 		botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 		// Send the GIF as an animation
 		err = sendGIF(botID, os.Getenv("TELE_TOKEN"), gifURL)
 		if err != nil {
-			return err
+			return  err
 		}
 	}
 

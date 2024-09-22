@@ -99,10 +99,18 @@ func LunchMiniApp() {
 		inlineKeys := [][]tele.InlineButton{
 			{inlineBtn},
 		}
-		log.Println("url:", webAppURL)
-		//c.Send("url :", webAppURL)
+		//check if the user has a habit made before or not
+		// h, err := GetHabit(int(c.Sender().ID))
+		// if err != nil {
+		// 	return err
+		// }
+		// if h.TeleID != 0 {
+		// 	c.Send(fmt.Sprintf("You already have a habit: %v", h))
+		// }
+
+		// Send the habit information separately
 		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
-		config.B = nil
+		//config.B = nil
 		log.Println("Stopping the bot")
 		return nil
 	})
@@ -110,9 +118,12 @@ func LunchMiniApp() {
 	// config.B.Handle(&inlineBtn, func(c tele.Context) error {
 	// 	user := c.Sender() // Get the user who clicked the button
 	// 	userID := user.ID
-
 	// 	log.Println("Stopping the bot")
 	// 	return nil
 	// })
 	config.B.Start()
+}
+
+func GetHabit(id int) (h bot.Habit, err error) {
+	return bot.GetDaysRecord(bot.RK(id))
 }

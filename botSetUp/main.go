@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	godotenv.Load()
-
 	log.Println("Server is running!")
 	godotenv.Load()
 	exec.Init()

@@ -21,7 +21,7 @@ func (m *Members) Add(key string) (err error) {
 	return
 }
 
-func getDaysRecord(key string) (h Habit, err error) {
+func GetDaysRecord(key string) (h Habit, err error) {
 	config.Rdb.HGetAll(context.Background(), key).Scan(&h)
 	return h, err
 }
@@ -71,19 +71,19 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 			percentageCompleted = (h.TotalDays * 100 / h.CommitmentPeriod)
 		}
 		ok := h.NotificationLog[time.Now().Day()]
-		if !ok { // Send notification only if the user hasn't recevied a notification on this day.
-
+		if !ok {
 			LevelMessage(h, percentageCompleted)
 		} else {
 			log.Println("this user has been informed today already")
 		}
 	}
+	return
 }
 
 // This get called by the cron job to run daily and sets the day as false, it will be true if the member did sport.
 
 func SetNotificationLog(key string) error {
-	h, err := getDaysRecord(key)
+	h, err := GetDaysRecord(key)
 	if err != nil {
 		log.Println("error getting days record: %v", err)
 		return nil
@@ -108,7 +108,7 @@ func SetNotificationLog(key string) error {
 
 }
 func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
-	h, err := getDaysRecord(key)
+	h, err := GetDaysRecord(key)
 	if err != nil {
 		log.Println("error getting days record: %v", err)
 		return nil
@@ -229,5 +229,25 @@ func ShitGenerator(memberActiveDaysMap map[int]Habit) {
 				h.Name)
 			Remind(msg)
 		}
+	}
+}
+
+type HabitLevel struct {
+	Name  string
+	Emoji string
+}
+
+// GetHabitLevel calculates the habit level based on the commitment period and days completed
+func GetHabitLevel(completionPercentage int) string {
+	// Determine the level based on the completion percentage
+	switch {
+	case completionPercentage >= 100:
+		return "Habit Hero 🏆"
+	case completionPercentage >= 40:
+		return "Motivation Seeker 🚀"
+	case completionPercentage >= 20:
+		return "Rising Star 🌟"
+	default:
+		return "New Challenger🌱"// 0% level
 	}
 }
