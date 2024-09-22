@@ -1,4 +1,4 @@
 .vscode
 Dockerfile
 .env
-.tmp
+./tmp
