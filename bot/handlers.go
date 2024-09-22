@@ -132,6 +132,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 	return pipe
 }
 
+// 6082662788 new set
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) {
 	log.Println("Itratings")

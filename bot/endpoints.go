@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	tele "gopkg.in/telebot.v3"
@@ -16,13 +17,44 @@ func StartBot() {
 }
 
 func StreakListner() {
-	config.B.Handle(tele.OnVideoNote, func(c tele.Context) (err error) {
+	config.B.Handle(tele.OnText, func(c tele.Context) (err error) {
 		VideoImgListner(c)
 		return
 	})
 	config.B.Handle(tele.OnPhoto, func(c tele.Context) (err error) {
 		VideoImgListner(c)
 		return
+	})
+	config.B.Handle("/sec", func(c tele.Context) (err error) {
+		c.Send("send me the id, shh")
+		search, err := strconv.Atoi(c.Message().Text)
+		if err != nil {
+			return err
+		}
+
+		h, err := GetDaysRecord(RK(search))
+		if err != nil {
+			return err
+		}
+		breakdownMessage := fmt.Sprintf(
+			"**Habit Breakdown:**\n"+
+				"**Name:** %s\n"+
+				"**Habit Name:** %s\n"+
+				"**Commitment Period:** %d days (%s)\n"+
+				"**Streak:** %d days\n"+
+				"**Top Hit:** %d days\n"+
+				"**Total Days Recorded:** %d\n"+
+				"**Created At:** %s\n",
+			h.Name,
+			h.HabitName,
+			h.CommitmentPeriod,
+			h.CommitmentPeriodStr,
+			h.Streaked,
+			h.TopHit,
+			h.TotalDays,
+			h.CreatedAt.Format("2006-01-02"),
+		)
+		return c.Send(breakdownMessage)
 	})
 
 	log.Println("Listeners are running")
@@ -32,7 +64,7 @@ func VideoImgListner(c tele.Context) (err error) {
 	var h Habit
 	h.TeleID = int(c.Sender().ID)
 	var key = RK(h.TeleID)
-	// Get old record
+	// Get old records
 	h, err = GetDaysRecord(key)
 	if err != nil {
 		return fmt.Errorf("error getting days record: %v", err)
