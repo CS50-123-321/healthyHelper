@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - All User Habits</title>
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+
+<div class="admin-container">
+    <h2>All User Habits</h2>
+    <p class="tagline">Monitor all users' habits and progress here.</p>
+    <table class="habits-table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>User Name</th>
+                <th>Habit Name</th>
+                <th>Commitment Period</th>
+                <th>Current Streak</th>
+                <th>Top Hit</th>
+                <th>Total Days Logged</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Habit }}
+            <tr>
+                <td>{{ .TeleID }}</td> 
+                <td>{{ .Name }}</td>
+                <td>{{ .HabitName }} days</td>
+                <td>{{ .CommitmentPeriod }} days</td>
+                <td>{{ .Streaked }} days</td>
+                <td>{{ .TopHit }} days</td>
+                <td>{{ .TotalDays }} days</td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="6">No habits found</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

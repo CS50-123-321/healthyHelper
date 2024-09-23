@@ -137,7 +137,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 
 // 6082662788 new set
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
-func Act(useCase string) {
+func Act(useCase string) (habits []Habit) {
 	log.Println("Itratings")
 	teleIDS, err := getMembersIDs()
 	if err != nil {
@@ -166,6 +166,7 @@ func Act(useCase string) {
 		if err != nil {
 			return
 		}
+		habits = append(habits, h)
 		MemberActiveDaysMap[teleID] = h
 	}
 	if useCase == "SendStatus" {
@@ -176,6 +177,7 @@ func Act(useCase string) {
 		log.Println("dailyWatch..")
 		DailyWatch(MemberActiveDaysMap)
 	}
+	return habits
 }
 
 func habitCalc(memberActiveDaysMap map[int]Habit) {

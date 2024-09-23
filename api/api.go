@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -75,6 +76,17 @@ func Server() {
 		})
 
 	})
+	router.GET("/dashoard", func(c *gin.Context) {
+		AllMemberHabits := bot.Act(" ")
+		// sortedMembers :=
+		sort.Slice(AllMemberHabits, func(i, j int) bool {
+			return AllMemberHabits[i].TotalDays > AllMemberHabits[j].TotalDays
+		})
+		c.HTML(http.StatusOK, "admin.html", gin.H{
+			"Habit": AllMemberHabits,
+		})
+
+	})
 	log.Println("Listening on port 0.0.0.0:8888")
 	if err := router.Run("0.0.0.0:8888"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
@@ -116,6 +128,19 @@ func LunchMiniApp() {
 		}
 		// Send the habit information separately
 		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
+		return nil
+	})
+	config.B.Handle("/Admin", func(c tele.Context) error {
+		log.Println("bot is running")
+		webAppURL := "https://familycody.fly.dev/bashboard"
+		inlineBtn := tele.InlineButton{
+			Text:   "Your Progress!",
+			WebApp: &tele.WebApp{URL: webAppURL},
+		}
+		inlineKeys := [][]tele.InlineButton{
+			{inlineBtn},
+		}
+		c.Send("Admin Dashboard", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		return nil
 	})
 
