@@ -39,7 +39,7 @@ func (h *Habit) SetUserStreak() {
 	sort.Ints(daysLogSlice)
 	sortedMap := make(map[int]bool)
 	for _, day := range daysLogSlice {
-		if day > time.Now().Day(){
+		if day > time.Now().Day() {
 			return
 		}
 		done := h.DaysLog[day]
@@ -186,37 +186,31 @@ func habitCalc(memberActiveDaysMap map[int]Habit) {
 	streakLeaderboard := []string{}
 
 	for _, habit := range memberActiveDaysMap {
-		// Track highest streak
 		if habit.Streaked > highestStreak {
 			highestStreak = habit.Streaked
 			highestStreakUser = habit
 		}
-		// Track highest top hit (i.e., total number of days)
 		if habit.TotalDays > highestTopHit {
 			highestTopHit = habit.TotalDays
 			highestTopHitUser = habit
 		}
-		// Add to streak leaderboard message (creative part)
 		streakLeaderboard = append(streakLeaderboard, fmt.Sprintf(
-			"🔥 %s is on a streak of %d days for habit **%s**!",
-			habit.Name, habit.Streaked, habit.HabitName))
+			"🔥 %s is on a streak of %d days for habit **%s**",
+			FormatMention(habit.Name, habit.TeleID), habit.Streaked, habit.HabitName))
 	}
 
-	// Creative overall message
 	topHitMsg := fmt.Sprintf(
-		"🏅 Highest Top Hit: %s has completed **%d** days of habit **%s**! 🚀",
-		highestTopHitUser.Name, highestTopHitUser.TotalDays, highestTopHitUser.HabitName)
+		"🏅 Highest Top Hit: %s has completed **%d** days of habit **%s** 🚀",
+		FormatMention(highestTopHitUser.Name, highestTopHitUser.TeleID), highestTopHitUser.TotalDays, highestTopHitUser.HabitName)
 
 	streakMsg := fmt.Sprintf(
-		"🥇 Highest Streak: %s is on a **%d-day streak** for habit **%s**! Keep going! 🔥",
-		highestStreakUser.Name, highestStreakUser.Streaked, highestStreakUser.HabitName)
+		"🥇 Highest Streak: %s is on a **%d day streak** for habit **%s** Keep going 🔥",
+		FormatMention(highestTopHitUser.Name, highestTopHitUser.TeleID), highestStreakUser.Streaked, highestStreakUser.HabitName)
 
-	// Creative summary message
 	summaryMsg := "📊 Daily Habit Overview:\n" +
-		fmt.Sprintf("We’ve got some habit warriors making great progress today! 🌟\n") +
+		fmt.Sprintf("We’ve got some habit warriors making great progress today 🌟\n") +
 		strings.Join(streakLeaderboard, "\n") + "\n\n" +
 		topHitMsg + "\n" + streakMsg
-	// Send the message
 	Remind(summaryMsg)
 }
 
@@ -233,10 +227,11 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 			msg = fmt.Sprintf(
 				"💩💩💩 %s 💩💩💩\n"+
 					"You missed today, Don't let it become a stinker tomorrow! 🚀",
-				h.Name)
+				FormatMention(h.Name, h.TeleID))
 		} else if ok && done {
-			msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", h.Name)
+			msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", FormatMention(h.Name, h.TeleID))
 		}
+		msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", FormatMention(h.Name, h.TeleID))
 		if msg != " " {
 			Remind(msg)
 		}
