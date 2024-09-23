@@ -177,6 +177,10 @@ func Act(useCase string) (habits []Habit) {
 		log.Println("dailyWatch..")
 		DailyWatch(MemberActiveDaysMap)
 	}
+	if useCase == "bestStreak" {
+		log.Println("bestStreak..")
+		BestStreak(habits)
+	}
 	return habits
 }
 
@@ -237,7 +241,6 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	}
 }
 
-
 // GetHabitLevel calculates the habit level based on the commitment period and days completed
 func GetHabitLevel(completionPercentage int) string {
 	// Determine the level based on the completion percentage
@@ -250,5 +253,31 @@ func GetHabitLevel(completionPercentage int) string {
 		return "Rising Star 🌟"
 	default:
 		return "New Challenger🌱" // 0% level
+	}
+}
+
+func BestStreak(AllMemberHabits []Habit) {
+	if len(AllMemberHabits) == 0 {
+		log.Println("BestStreak, no members to get the best of them")
+		return
+	}
+	sort.Slice(AllMemberHabits, func(i, j int) bool {
+		return AllMemberHabits[i].TotalDays > AllMemberHabits[j].TotalDays
+	})
+	topDays := AllMemberHabits[0].TotalDays
+	if topDays == 0 {
+		log.Println("BestStreak, no one has done anything impressive sofar, fuck off")
+		return
+	}
+	var topUsers []string
+	for _, habit := range AllMemberHabits {
+		if habit.TotalDays == topDays {
+			topUsers = append(topUsers, FormatMention(habit.Name, habit.TeleID)) // Add user name with top TotalDays
+		} else {
+			break // Exit loop when TotalDays value changes
+		}
+	}
+	for _, msg := range topUsers {
+		Remind(fmt.Sprintf("You are doing great, %s", msg))
 	}
 }
