@@ -57,13 +57,12 @@ func Server() {
 
 	router.GET("/progress", func(c *gin.Context) {
 		var p ProgresRequest
-		err := c.ShouldBindJSON(&p)
+		tid := c.Query("tele_id")
+		p.TeleID, err = strconv.Atoi(tid)
 		if err != nil {
-			log.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
 		}
-		//p.TeleID = 175864127
-
 		err, h := getUserProgress(p.TeleID)
 		if err != nil {
 			log.Println(err)

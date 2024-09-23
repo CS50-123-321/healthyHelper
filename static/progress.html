@@ -36,6 +36,18 @@
     </div>
     <button onclick="window.history.back()">Back to Form</button>
 </div>
+<input type="hidden" id="tele_id" value="">
 
+<script>
+    // Fetch the tele_id from the URL
+    function getSessionID() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('tele_id'); 
+    }
+
+    document.getElementById('tele_id').value = getSessionID();
+
+    const tele_id = getSessionID();
+</script>
 </body>
 </html>
