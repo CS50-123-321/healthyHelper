@@ -76,7 +76,7 @@ func Server() {
 		})
 
 	})
-	router.GET("/dashoard", func(c *gin.Context) {
+	router.GET("/dashboard", func(c *gin.Context) {
 		AllMemberHabits := bot.Act(" ")
 		// sortedMembers :=
 		sort.Slice(AllMemberHabits, func(i, j int) bool {
@@ -85,13 +85,11 @@ func Server() {
 		c.HTML(http.StatusOK, "admin.html", gin.H{
 			"Habit": AllMemberHabits,
 		})
-
 	})
 	log.Println("Listening on port 0.0.0.0:8888")
 	if err := router.Run("0.0.0.0:8888"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-
 }
 
 func LunchMiniApp() {
@@ -116,25 +114,22 @@ func LunchMiniApp() {
 	})
 	config.B.Handle("/Me", func(c tele.Context) error {
 		log.Println("bot is running")
-		// Create the button with the session ID as a URL parameter
 		webAppURL := fmt.Sprintf("https://familycody.fly.dev/progress?tele_id=%d", c.Sender().ID)
 		inlineBtn := tele.InlineButton{
 			Text:   "Your Progress!",
 			WebApp: &tele.WebApp{URL: webAppURL},
 		}
-
 		inlineKeys := [][]tele.InlineButton{
 			{inlineBtn},
 		}
-		// Send the habit information separately
 		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		return nil
 	})
 	config.B.Handle("/Admin", func(c tele.Context) error {
 		log.Println("bot is running")
-		webAppURL := "https://familycody.fly.dev/bashboard"
+		webAppURL := "https://familycody.fly.dev/dashboard"
 		inlineBtn := tele.InlineButton{
-			Text:   "Your Progress!",
+			Text:   "Dashboard!",
 			WebApp: &tele.WebApp{URL: webAppURL},
 		}
 		inlineKeys := [][]tele.InlineButton{
@@ -143,10 +138,7 @@ func LunchMiniApp() {
 		c.Send("Admin Dashboard", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		return nil
 	})
-
 	config.B.Start()
 }
 
-func GetHabit(id int) (h bot.Habit, err error) {
-	return bot.GetDaysRecord(bot.RK(id))
-}
+func GetHabit(id int) (h bot.Habit, err error) { return bot.GetDaysRecord(bot.RK(id)) }
