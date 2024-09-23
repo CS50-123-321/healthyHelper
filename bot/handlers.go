@@ -237,10 +237,6 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	}
 }
 
-type HabitLevel struct {
-	Name  string
-	Emoji string
-}
 
 // GetHabitLevel calculates the habit level based on the commitment period and days completed
 func GetHabitLevel(completionPercentage int) string {
