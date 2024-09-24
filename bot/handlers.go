@@ -138,7 +138,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 // 6082662788 new set
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) (habits []Habit) {
-	log.Println("Itratings")
+	log.Println("Itratings...")
 	teleIDS, err := getMembersIDs()
 	if err != nil {
 		log.Println("err in InitOffDay while getting all member id: ", err)
@@ -180,6 +180,10 @@ func Act(useCase string) (habits []Habit) {
 	if useCase == "bestStreak" {
 		log.Println("bestStreak..")
 		BestStreak(habits)
+	}
+	if useCase == "MentionAll" {
+		log.Println("MentionAll..")
+		MentionAll(habits)
 	}
 	return habits
 }
@@ -256,6 +260,11 @@ func GetHabitLevel(completionPercentage int) string {
 	}
 }
 
+type Tag struct {
+	TagBody string
+	Streak  int
+}
+
 func BestStreak(AllMemberHabits []Habit) {
 	if len(AllMemberHabits) == 0 {
 		log.Println("BestStreak, no members to get the best of them")
@@ -269,15 +278,27 @@ func BestStreak(AllMemberHabits []Habit) {
 		log.Println("BestStreak, no one has done anything impressive sofar, fuck off")
 		return
 	}
-	var topUsers []string
+	topUsers := []Tag{}
 	for _, habit := range AllMemberHabits {
 		if habit.TotalDays == topDays {
-			topUsers = append(topUsers, FormatMention(habit.Name, habit.TeleID)) // Add user name with top TotalDays
+			topUsers = append(topUsers, Tag{
+				TagBody: FormatMention(habit.Name, habit.TeleID),
+				Streak:  habit.Streaked,
+			})
 		} else {
-			break // Exit loop when TotalDays value changes
+			break
 		}
 	}
-	for _, msg := range topUsers {
-		Remind(fmt.Sprintf("You are doing great, %s", msg))
+	for _, tag := range topUsers {
+		msg := fmt.Sprintf("Look at you go\\!\\! \n %s You're already at %v days\\. One step closer to being a habit hero\\!", tag.TagBody, tag.Streak)
+		Remind(msg)
 	}
+}
+
+func MentionAll(habits []Habit) {
+	var MentionAllBody string
+	for _, h := range habits {
+		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
+	}
+	Remind("Let's keep our streak on" + MentionAllBody)
 }

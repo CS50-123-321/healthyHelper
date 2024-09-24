@@ -6,6 +6,7 @@
 - Making a table-alike in redis for configration
 - Configrable reminder per member.
 - Sending spoliers
+- Checking the streak count.
 ## Done
 - Reset function Done
 - Tag members #Better_engagment @1
