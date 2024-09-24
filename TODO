@@ -5,8 +5,11 @@
   - Quote
 - Making a table-alike in redis for configration
 - Configrable reminder per member.
-- Sending spoliers
-- Checking the streak count.
+- Refresh the db; if the user was inactive in the day, a cron job should be ran to ensure accurate calc is being add to redis.
 ## Done
-- Reset function Done
-- Tag members #Better_engagment @1
+- Reset function Done.
+- Tag members #Better_engagment @1.
+- Checking the streak count.
+- Sending spoliers
+
+

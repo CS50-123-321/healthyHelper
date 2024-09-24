@@ -43,19 +43,17 @@ func VideoImgListner(c tele.Context) (err error) {
 		return fmt.Errorf("this teleID doesn''t exsist in redis: %v", err)
 	}
 
-	// Unmarshell it to the struct
 	err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling JSON: %v", err)
 	}
-	// Marking day as true
 	h.DaysLog[time.Now().Day()] = true
 
 	h.DaysLogByte, err = json.Marshal(h.DaysLog)
 	if err != nil {
 		return err
 	}
-	h.SetUserStreak() //calc streak info
+	h.SetUserStreak()
 	if h.TopHit == 0 {
 		h.TotalDays = 0
 		h.Streaked = 0

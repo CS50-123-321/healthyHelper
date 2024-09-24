@@ -7,12 +7,6 @@ import (
 	"strconv"
 )
 
-// Daily reminder
-// Daily ranking
-// New joiners (say hi to x and y)
-// Custom /comman for fetching the Top Ranking ETC
-// Hero
-
 func LevelMessage(h Habit, percentageCompleted int) (err error) {
 	var msg string
 	var gifURL string
