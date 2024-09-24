@@ -169,19 +169,17 @@ func Act(useCase string) (habits []Habit) {
 		habits = append(habits, h)
 		MemberActiveDaysMap[teleID] = h
 	}
-	if useCase == "SendStatus" {
-		log.Println("sending status to everyone")
+	switch useCase{
+	case "SendStatus":
+		log.Println("SendStatus..")
 		habitCalc(MemberActiveDaysMap)
-	}
-	if useCase == "dailyWatch" {
+	case "dailyWatch":
 		log.Println("dailyWatch..")
 		DailyWatch(MemberActiveDaysMap)
-	}
-	if useCase == "bestStreak" {
+	case "bestStreak":
 		log.Println("bestStreak..")
 		BestStreak(habits)
-	}
-	if useCase == "MentionAll" {
+	case "MentionAll":
 		log.Println("MentionAll..")
 		MentionAll(habits)
 	}
