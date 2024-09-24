@@ -9,6 +9,7 @@ import (
 )
 
 func InitCron() {
+	fmt.Println("hey", time.Now())
 	every12("02:30AM", func() { fmt.Println("hey") })    // 8:15 AM Baghdad time
 	every12("08:15AM", func() { bot.Act("MentionAll") }) // 8:15 AM Baghdad time
 	every12("08:20AM", func() { bot.Act("bestStreak") }) // 8:20 AM Baghdad time
@@ -23,7 +24,7 @@ func every12(twelveHourTime string, job func()) {
 		return
 	}
 
-	baghdadTime := t.Add(3 * time.Hour) 
+	baghdadTime := t.Add(3 * time.Hour)
 
 	duration := fmt.Sprintf("%d %d * * *", baghdadTime.Minute(), baghdadTime.Hour())
 
