@@ -9,7 +9,7 @@ import (
 )
 
 func InitCron() {
-	every12("02:22AM", func() { fmt.Println("hey") })    // 8:15 AM Baghdad time
+	every12("02:30AM", func() { fmt.Println("hey") })    // 8:15 AM Baghdad time
 	every12("08:15AM", func() { bot.Act("MentionAll") }) // 8:15 AM Baghdad time
 	every12("08:20AM", func() { bot.Act("bestStreak") }) // 8:20 AM Baghdad time
 	every12("07:00PM", func() { bot.Act("SendStatus") }) // 7:00 PM Baghdad time
@@ -29,6 +29,7 @@ func every12(twelveHourTime string, job func()) {
 
 	every(duration, job)
 }
+
 func every(duration string, job func()) {
 	c := cron.New()
 	c.AddFunc(duration, func() {
