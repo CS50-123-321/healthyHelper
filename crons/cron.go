@@ -10,8 +10,9 @@ import (
 
 
 func InitCron() {
+	bot.Act("GenerateAiRandomMember")
 	//msg, _ := plugin.GeneratePersonlizeResponse(habit)
-	every12("02:55AM", func() { fmt.Println("hey") })                // 08:15 AM Baghdad Time
+	every12("03:51AM", func() { fmt.Println("hey") })                // 08:15 AM Baghdad Time
 	every12("02:50PM", func() { bot.Act("GenerateAiRandomMember") }) // 08:15 AM Baghdad Time
 	every12("08:10AM", func() { bot.Act("MentionAll") })             // 08:15 AM Baghdad Time
 	every12("08:20AM", func() { bot.Act("bestStreak") })             // 08:20 AM Baghdad Time

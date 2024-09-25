@@ -313,5 +313,6 @@ func SendAiPersonalizedMsg(habits []Habit) {
 		log.Println("err SendAiPersonalizedMsg", err)
 		return
 	}
+	AiResponse = EscapeMarkdown(AiResponse)
 	Remind(AiResponse)
 }

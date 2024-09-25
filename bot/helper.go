@@ -26,22 +26,13 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-var reTryLimit int = 3
-
 func Remind(text string) (err error) {
-	if reTryLimit == 0 {
-		fmt.Println("Reached max tries")
-		return nil
-	}
 	log.Println("running remind")
-	text = EscapeMarkdown(text)
 	botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 	log.Println("botid", botID)
-	_, err = config.B.Send(tele.ChatID(botID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+	_, err = config.B.Send(tele.ChatID(-4580179828), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
-		log.Println("Remind: errsending the msg: ", reTryLimit, err)
-		reTryLimit--
-		return Remind(text)
+		log.Println("Remind: errsending the msg: ", err)
 	}
 	return err
 }
