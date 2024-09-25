@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"sort"
 	"strings"
 	"time"
@@ -169,7 +170,8 @@ func Act(useCase string) (habits []Habit) {
 		habits = append(habits, h)
 		MemberActiveDaysMap[teleID] = h
 	}
-	switch useCase{
+
+	switch useCase {
 	case "SendStatus":
 		log.Println("SendStatus..")
 		habitCalc(MemberActiveDaysMap)
@@ -182,6 +184,9 @@ func Act(useCase string) (habits []Habit) {
 	case "MentionAll":
 		log.Println("MentionAll..")
 		MentionAll(habits)
+	case "GenerateAiRandomMember":
+		log.Println("SendAiPersonalizedMsg..")
+		SendAiPersonalizedMsg(habits)
 	}
 	return habits
 }
@@ -299,4 +304,14 @@ func MentionAll(habits []Habit) {
 		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
 	}
 	Remind("Let's keep our streak on//!//!/n" + EscapeMarkdown(MentionAllBody))
+}
+
+func SendAiPersonalizedMsg(habits []Habit) {
+	rndIndx := rand.Intn(len(habits))
+	AiResponse, err := GetAiResponse(habits[rndIndx])
+	if err != nil {
+		log.Println("err SendAiPersonalizedMsg", err)
+		return
+	}
+	Remind(AiResponse)
 }

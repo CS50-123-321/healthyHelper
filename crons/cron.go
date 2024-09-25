@@ -9,11 +9,13 @@ import (
 )
 
 func InitCron() {
-	every12("02:55AM", func() { fmt.Println("hey") })    // 08:15 AM Baghdad Time
-	every12("11:16AM", func() { bot.Act("MentionAll") }) // 08:15 AM Baghdad Time
-	every12("08:20AM", func() { bot.Act("bestStreak") }) // 08:20 AM Baghdad Time
-	every12("07:00PM", func() { bot.Act("SendStatus") }) // 07:00 PM Baghdad Time
-	every12("10:00PM", func() { bot.Act("dailyWatch") }) // 10:00 PM Baghdad Time
+	//msg, _ := plugin.GeneratePersonlizeResponse(habit)
+	every12("02:55AM", func() { fmt.Println("hey") })                // 08:15 AM Baghdad Time
+	every12("02:40pm", func() { bot.Act("GenerateAiRandomMember") }) // 08:15 AM Baghdad Time
+	every12("08:10AM", func() { bot.Act("MentionAll") })             // 08:15 AM Baghdad Time
+	every12("08:20AM", func() { bot.Act("bestStreak") })             // 08:20 AM Baghdad Time
+	every12("07:00PM", func() { bot.Act("SendStatus") })             // 07:00 PM Baghdad Time
+	every12("10:00PM", func() { bot.Act("dailyWatch") })             // 10:00 PM Baghdad Time
 }
 
 func every12(twelveHourTime string, job func()) {

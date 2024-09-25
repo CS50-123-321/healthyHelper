@@ -4,6 +4,8 @@ import (
 	"StreakHabitBulder/config"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -24,12 +26,22 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-func Remind(text string) (err error) {
-	log.Println("running remind", text)
+var reTryLimit int = 3
 
-	_, err = config.B.Send(tele.ChatID(-4580179828), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+func Remind(text string) (err error) {
+	if reTryLimit == 0 {
+		fmt.Println("Reached max tries")
+		return nil
+	}
+	log.Println("running remind")
+	text = EscapeMarkdown(text)
+	botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
+	log.Println("botid", botID)
+	_, err = config.B.Send(tele.ChatID(botID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
-		log.Println("Remind: errsending the msg: ", err)
+		log.Println("Remind: errsending the msg: ", reTryLimit, err)
+		reTryLimit--
+		return Remind(text)
 	}
 	return err
 }
@@ -42,6 +54,8 @@ func EscapeMarkdown(text string) string {
 	replacer := strings.NewReplacer(
 		"-", "\\-",
 		"!", "\\!",
+		"#", "\\",
+		".", "\\.",
 	)
 	return replacer.Replace(text)
 }
