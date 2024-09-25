@@ -4,6 +4,7 @@ import (
 	"StreakHabitBulder/config"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	tele "gopkg.in/telebot.v3"
@@ -35,4 +36,15 @@ func Remind(text string) (err error) {
 func RK(id int) string { return fmt.Sprintf("habitMember:%d", id) }
 func FormatMention(Name string, teleID int) (msg string) {
 	return fmt.Sprintf("[%s](tg://user?id=%d)", Name, teleID)
+}
+
+func EscapeMarkdown(text string) string {
+	replacer := strings.NewReplacer(
+		".", "\\.",
+		"-", "\\-",
+		"(", "\\(",
+		")", "\\)",
+		"!", "\\!",
+	)
+	return replacer.Replace(text)
 }

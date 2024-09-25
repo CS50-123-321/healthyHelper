@@ -9,6 +9,7 @@ import (
 )
 
 func InitCron() {
+	bot.Act("MentionAll") 
 	every12("02:55AM", func() { fmt.Println("hey") })    // 08:15 AM Baghdad Time
 	every12("11:16AM", func() { bot.Act("MentionAll") }) // 08:15 AM Baghdad Time
 	every12("08:20AM", func() { bot.Act("bestStreak") }) // 08:20 AM Baghdad Time
