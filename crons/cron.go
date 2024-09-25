@@ -9,12 +9,11 @@ import (
 )
 
 func InitCron() {
-	fmt.Println("hey", time.Now())
-	every12("02:55AM", func() { fmt.Println("hey") })    // 8:15 AM Baghdad time
-	every12("08:15AM", func() { bot.Act("MentionAll") }) // 8:15 AM Baghdad time
-	every12("08:20AM", func() { bot.Act("bestStreak") }) // 8:20 AM Baghdad time
-	every12("07:00PM", func() { bot.Act("SendStatus") }) // 7:00 PM Baghdad time
-	every12("10:00PM", func() { bot.Act("dailyWatch") }) // 10:00 PM Baghdad time
+	every12("02:55AM", func() { fmt.Println("hey") })    // 08:15 AM Baghdad Time
+	every12("11:16AM", func() { bot.Act("MentionAll") }) // 08:15 AM Baghdad Time
+	every12("08:20AM", func() { bot.Act("bestStreak") }) // 08:20 AM Baghdad Time
+	every12("07:00PM", func() { bot.Act("SendStatus") }) // 07:00 PM Baghdad Time
+	every12("10:00PM", func() { bot.Act("dailyWatch") }) // 10:00 PM Baghdad Time
 }
 
 func every12(twelveHourTime string, job func()) {

@@ -24,7 +24,7 @@ func validateMembers(member *Members) error {
 }
 
 func Remind(text string) (err error) {
-	log.Println("running remind")
+	log.Println("running remind", text)
 
 	_, err = config.B.Send(tele.ChatID(-4580179828), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
