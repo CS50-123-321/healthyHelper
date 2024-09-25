@@ -298,5 +298,5 @@ func MentionAll(habits []Habit) {
 	for _, h := range habits {
 		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
 	}
-	Remind("Let's keep our streak on" + EscapeMarkdown(MentionAllBody))
+	Remind("Let's keep our streak on//!//!/n" + EscapeMarkdown(MentionAllBody))
 }
