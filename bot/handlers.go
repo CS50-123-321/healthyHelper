@@ -308,11 +308,13 @@ func MentionAll(habits []Habit) {
 
 func SendAiPersonalizedMsg(habits []Habit) {
 	rndIndx := rand.Intn(len(habits))
-	AiResponse, err := GetAiResponse(habits[rndIndx])
+	h := habits[rndIndx]
+	AiResponse, err := GetAiResponse(h)
 	if err != nil {
 		log.Println("err SendAiPersonalizedMsg", err)
 		return
 	}
 	AiResponse = EscapeMarkdown(AiResponse)
-	Remind(AiResponse)
+	ExecAbleBody := FormatMention(h.Name, h.TeleID)
+	Remind(fmt.Sprintf("%s \n %s", ExecAbleBody, AiResponse))
 }

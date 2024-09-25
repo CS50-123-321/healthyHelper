@@ -8,12 +8,11 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-
 func InitCron() {
 	bot.Act("GenerateAiRandomMember")
 	//msg, _ := plugin.GeneratePersonlizeResponse(habit)
-	every12("03:51AM", func() { fmt.Println("hey") })                // 08:15 AM Baghdad Time
-	every12("02:50PM", func() { bot.Act("GenerateAiRandomMember") }) // 08:15 AM Baghdad Time
+	every12("09:00AM", func() { fmt.Println("hey") })                // 08:15 AM Baghdad Time
+	every12("09:00PM", func() { bot.Act("GenerateAiRandomMember") }) // 08:15 AM Baghdad Time
 	every12("08:10AM", func() { bot.Act("MentionAll") })             // 08:15 AM Baghdad Time
 	every12("08:20AM", func() { bot.Act("bestStreak") })             // 08:20 AM Baghdad Time
 	every12("07:00PM", func() { bot.Act("SendStatus") })             // 07:00 PM Baghdad Time
