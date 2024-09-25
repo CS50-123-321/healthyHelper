@@ -29,8 +29,7 @@ func validateMembers(member *Members) error {
 func Remind(text string) (err error) {
 	log.Println("running remind")
 	botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
-	log.Println("botid", botID)
-	_, err = config.B.Send(tele.ChatID(-4580179828), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+	_, err = config.B.Send(tele.ChatID(botID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
 		log.Println("Remind: errsending the msg: ", err)
 	}

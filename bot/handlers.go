@@ -298,12 +298,30 @@ func BestStreak(AllMemberHabits []Habit) {
 	}
 }
 
+var maxRetriesLimit int = 3
+
 func MentionAll(habits []Habit) {
+	var promptLanguage []string = []string{"Generate a morning message for group of habit builders, it has to be cool and motivating",
+		"In Arabic//, Generate a morning message for group of habit builders, it has to be cool and motivating"}
 	var MentionAllBody string
 	for _, h := range habits {
 		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
 	}
-	Remind("Let's keep our streak on//!//!/n" + EscapeMarkdown(MentionAllBody))
+	for i := range promptLanguage {
+		p := promptLanguage[i]
+		AiResponse, err := GenerateText(p)
+		if maxRetriesLimit == 0 {
+			log.Println("reaching max tried in mentionAll")
+			return
+		}
+		if err != nil {
+			maxRetriesLimit--
+			GenerateText(p)
+			return
+		}
+		msg := EscapeMarkdown(AiResponse)
+		Remind(fmt.Sprintf("%s\n%s", msg, EscapeMarkdown(MentionAllBody)))
+	}
 }
 
 func SendAiPersonalizedMsg(habits []Habit) {
