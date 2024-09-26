@@ -226,6 +226,7 @@ func habitCalc(memberActiveDaysMap map[int]Habit) {
 }
 
 func DailyWatch(memberActiveDaysMap map[int]Habit) {
+	var p HabitMessage
 	for _, h := range memberActiveDaysMap {
 		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
 		if err != nil {
@@ -234,16 +235,23 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 		}
 		var msg string
 		done, ok := h.DaysLog[time.Now().Day()]
+		tag := FormatMention(h.Name, h.TeleID)
+		p.HabitMsgs(h, Dailywtch) // this filles the structs the promits based on the function need.
 		if ok && !done {
-			msg = fmt.Sprintf(
-				"💩💩💩 %s 💩💩💩\n"+
-					"You missed today, Don't let it become a stinker tomorrow! 🚀",
-				FormatMention(h.Name, h.TeleID))
+			msg, err = GenerateText(p.DailyWatch.NotCommited)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 		} else if ok && done {
-			msg = fmt.Sprintf("🌟 Thank you so much %s for doing your habit, you're on fire!🚀", FormatMention(h.Name, h.TeleID))
+			msg, err = GenerateText(p.DailyWatch.Committed)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 		}
-		if msg != " " {
-			Remind(msg)
+		if msg != "" {
+			Remind(EscapeMarkdown(msg), tag)
 		}
 	}
 }

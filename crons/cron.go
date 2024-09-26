@@ -13,7 +13,7 @@ func InitCron() {
 	every12("09:00PM", func() { bot.Act("GenerateAiRandomMember") }) // 08:15 AM Baghdad Time
 	every12("08:10AM", func() { bot.Act("MentionAll") })             // 08:15 AM Baghdad Time
 	every12("08:20AM", func() { bot.Act("bestStreak") })             // 08:20 AM Baghdad Time
-	every12("07:00PM", func() { bot.Act("SendStatus") })             // 07:00 PM Baghdad Time
+	//every12("07:00PM", func() { bot.Act("SendStatus") })             // 07:00 PM Baghdad Time
 	every12("10:00PM", func() { bot.Act("dailyWatch") })             // 10:00 PM Baghdad Time
 }
 
