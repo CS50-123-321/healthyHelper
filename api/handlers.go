@@ -50,6 +50,7 @@ func Create(h bot.Habit) (err error) {
 		"top_hit":           h.TopHit,
 		"notification_log":  h.NotificationLogBytes,
 		"created_at":        h.CreatedAt,
+		"category":          h.Category,
 	}).Err()
 	if err != nil {
 		return err

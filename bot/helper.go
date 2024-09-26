@@ -47,7 +47,7 @@ func EscapeMarkdown(text string) string {
 	replacer := strings.NewReplacer(
 		"-", "\\-",
 		"!", "\\!",
-		"#", "\\",
+		"#", "\\#",
 		".", "\\.",
 		"(", "\\(",
 		")", "\\)",
