@@ -301,8 +301,8 @@ func BestStreak(AllMemberHabits []Habit) {
 var maxRetriesLimit int = 3
 
 func MentionAll(habits []Habit) {
-	var promptLanguage []string = []string{"Generate a morning message for group of habit builders, it has to be cool and motivating",
-		"In Arabic//, Generate a morning message for group of habit builders, it has to be cool and motivating"}
+	var promptLanguage []string = []string{"In English, Generate a morning message for group of habit builders, it has to be cool and motivating",
+		"In Arabic, Generate a morning message for group of habit builders, it has to be cool and motivating"}
 	var MentionAllBody string
 	for _, h := range habits {
 		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
