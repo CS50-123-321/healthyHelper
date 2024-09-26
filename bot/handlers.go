@@ -136,7 +136,13 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 	return pipe
 }
 
-// 6082662788 new set
+const (
+	GenerateAiRandomMemberUseCASE = "GenerateAiRandomMember" // This sends ai genereted boost for random member in the goup.#AIGen
+	MentionAllUseCASE             = "MentionAll"             // 	This sends a morning alike msg while mentioning everyone. #AIGen
+	BestStreakUseCASE             = "bestStreak"             // This sends boost msg for the winner member. #AIGen
+	DailyWatchUseCASE             = "dailyWatch"             //This sends positive msg to those who commit and sad song for those who didn't #AIGen
+)
+
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) (habits []Habit) {
 	log.Println("Itratings...")
@@ -175,16 +181,16 @@ func Act(useCase string) (habits []Habit) {
 	case "SendStatus":
 		log.Println("SendStatus..")
 		habitCalc(MemberActiveDaysMap)
-	case "dailyWatch":
+	case DailyWatchUseCASE:
 		log.Println("dailyWatch..")
 		DailyWatch(MemberActiveDaysMap)
-	case "bestStreak":
+	case BestStreakUseCASE:
 		log.Println("bestStreak..")
 		BestStreak(habits)
-	case "MentionAll":
+	case MentionAllUseCASE:
 		log.Println("MentionAll..")
 		MentionAll(habits)
-	case "GenerateAiRandomMember":
+	case GenerateAiRandomMemberUseCASE:
 		log.Println("SendAiPersonalizedMsg..")
 		SendAiPersonalizedMsg(habits)
 	}

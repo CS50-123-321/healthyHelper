@@ -1,3 +1,4 @@
+# Ideas and  todos.
 - Customized dm-based reminder
 - Send Gif #Better_engagment
 - Send unexpected stuff #Better_engagment @2
@@ -5,19 +6,17 @@
   - Quote
 - Making a table-alike in redis for configration
 - Configrable reminder per member.
-- Refresh the db; if the user was inactive in the day, a cron job should be ran to ensure accurate calc is being add to redis.
-- Make the usecase more  understabable 
+- Refresh redis; if the user was inactive in the day, a cron job should be ran to ensure accurate calc is being add to redis.
 - Taking out all the fixed text, and replacing it with ai generated text.
 - Making its use generic for people
 - Making the promot more flexiable
-- Promot generating function based on the user.
-- Promot db
 - Making sure all members get ai generated boost
 - Certificate Generating being granted on each level.
 ## Done
 - Reset function Done.
 - Tag members #Better_engagment @1.
 - Checking the streak count.
-- Sending spoliers
-
+- Sending spoliers || ||
+- Promot generating function based on the user.
+- Make the usecase more  understabable 
 
