@@ -151,6 +151,10 @@ func Act(useCase string) (habits []Habit) {
 		log.Println("err in InitOffDay while getting all member id: ", err)
 		return
 	}
+	if len(teleIDS) == 0 {
+		log.Println("getMembersIDs return empty slice")
+		return []Habit{}
+	}
 	MembersCmdsMap := make(map[int]*redis.MapStringStringCmd)
 	pipe := config.Rdb.Pipeline()
 	for _, TId := range teleIDS {
@@ -339,8 +343,28 @@ func MentionAll(habits []Habit) {
 }
 
 func SendAiPersonalizedMsg(habits []Habit) {
+	var tries int = len(habits)
+	if tries == 0 { // to avoid infinite recursivnessnessnessnessness
+		log.Println("all members have recieved an ai generated boost")
+		return
+	}
 	rndIndx := rand.Intn(len(habits))
 	h := habits[rndIndx]
+	found := config.Rdb.SIsMember(context.Background(), "sentList:membersIDS", h.TeleID).Val()
+	if found {
+		habits = append(habits[:rndIndx], habits[rndIndx+1:]...) // cutting the already sent to member and procceed.
+		SendAiPersonalizedMsg(habits)                            // recursively calling back until reaching new memeber
+		return
+	}
+	config.Rdb.SAdd(context.Background(), "sentList:membersIDS", h.TeleID)
+	now := time.Now()
+	midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+	durationUntilMidnight := time.Until(midnight) //set it tobe deletedd after the end of todayyyyy
+	err := config.Rdb.Conn().Expire(context.Background(), "sentList:membersIDS", durationUntilMidnight).Err()
+	if err != nil {
+		fmt.Println("Error setting TTL:", err)
+	}
+
 	AiResponse, err := GetAiResponse(h)
 	if err != nil {
 		log.Println("err SendAiPersonalizedMsg", err)
