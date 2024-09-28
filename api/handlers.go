@@ -50,7 +50,7 @@ func Create(h bot.Habit) (err error) {
 		"top_hit":           h.TopHit,
 		"notification_log":  h.NotificationLogBytes,
 		"created_at":        h.CreatedAt,
-		"category":          h.Category,
+		"IsGroup":           h.IsGroup,
 	}).Err()
 	if err != nil {
 		return err
@@ -63,8 +63,12 @@ func Create(h bot.Habit) (err error) {
 	if err != nil {
 		return err
 	}
-	//msg := fmt.Sprintf("Yay🎉🎉, new habit maker joiner, welcome 🎉%v🎉, Habit: %v", h.Name, h.HabitName)
-	//bot.Remind(msg)
+	msg := fmt.Sprintf("Yay🎉🎉, new habit maker joiner, welcome 🎉%v🎉, Habit: %v", h.Name, h.HabitName)
+	chatID := 0
+	if h.IsGroup {
+		chatID = h.TeleID
+	}
+	bot.Remind(msg, chatID)
 	return
 }
 func getUserProgress(teleId int) (err error, h bot.Habit) {

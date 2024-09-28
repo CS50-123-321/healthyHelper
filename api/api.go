@@ -47,6 +47,11 @@ func Server() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing session ID"})
 			return
 		}
+		if h.SoloSre != "" && h.SoloSre == "no" {
+			h.IsGroup = true
+		} else if h.SoloSre != "" && h.SoloSre == "yes" {
+			h.IsGroup = false
+		}
 		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})

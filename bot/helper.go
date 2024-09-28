@@ -26,13 +26,20 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-func Remind(text string, tag ...string) (err error) {
+func Remind(text string, chatID int, tag ...string) (err error) {
 	log.Println("running remind")
-	botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
+	if chatID == 0 {
+		chatID, _ = strconv.Atoi(os.Getenv("TestingBotID"))
+
+	} else {
+		chatID = chatID
+	}
+
 	if len(tag) == 1 {
 		text = fmt.Sprintf("%s \n %s", tag[0], text)
 	}
-	_, err = config.B.Send(tele.ChatID(botID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+
+	_, err = config.B.Send(tele.ChatID(chatID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
 		log.Println("Remind: errsending the msg: ", err)
 	}

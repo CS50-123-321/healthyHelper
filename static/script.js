@@ -13,7 +13,8 @@ document.getElementById('habitForm').addEventListener('submit', async function (
         name: document.getElementById('name').value,
         habit_name: document.getElementById('habit_name').value,
         commitment_Period: document.getElementById('commitment_Period').value,
-        tele_id: sessionID 
+        tele_id: sessionID,
+        solo: document.getElementById('solo').value
 
     };
     try {

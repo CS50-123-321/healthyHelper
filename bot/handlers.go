@@ -232,12 +232,18 @@ func habitCalc(memberActiveDaysMap map[int]Habit) {
 		fmt.Sprintf("We’ve got some habit warriors making great progress today 🌟\n") +
 		strings.Join(streakLeaderboard, "\n") + "\n\n" +
 		topHitMsg + "\n" + streakMsg
-	Remind(summaryMsg)
+	chatID := 0
+	// if highestStreakUser.IsGroup {
+	// 	chatID = highestStreakUser.TeleID
+	// } this is for the group only
+	Remind(summaryMsg, chatID)
 }
 
 func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	var p HabitMessage
 	for _, h := range memberActiveDaysMap {
+		log.Println("00000000", h.Name, h.IsGroup)
+
 		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
 		if err != nil {
 			log.Println(err)
@@ -260,8 +266,12 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 				return
 			}
 		}
+		chatID := 0
+		if !h.IsGroup {
+			chatID = h.TeleID
+		}
 		if msg != "" {
-			Remind(EscapeMarkdown(msg), tag)
+			Remind(EscapeMarkdown(msg), chatID, tag)
 		}
 	}
 }
@@ -312,7 +322,7 @@ func BestStreak(AllMemberHabits []Habit) {
 	}
 	for _, tag := range topUsers {
 		msg := fmt.Sprintf("Look at you go\\!\\! \n %s You're already at %v days\\. One step closer to being a habit hero\\!", tag.TagBody, tag.Streak)
-		Remind(msg)
+		Remind(msg, 0) //TODO: make this sending to the user dm if solo learner.
 	}
 }
 
@@ -338,7 +348,7 @@ func MentionAll(habits []Habit) {
 			return
 		}
 		msg := EscapeMarkdown(AiResponse)
-		Remind(fmt.Sprintf("%s\n%s", msg, EscapeMarkdown(MentionAllBody)))
+		Remind(fmt.Sprintf("%s\n%s", msg, EscapeMarkdown(MentionAllBody)), 0) // this doesn't work for now. TODO:
 	}
 }
 
@@ -372,5 +382,9 @@ func SendAiPersonalizedMsg(habits []Habit) {
 	}
 	AiResponse = EscapeMarkdown(AiResponse)
 	ExecAbleBody := FormatMention(h.Name, h.TeleID)
-	Remind(fmt.Sprintf("%s \n %s", ExecAbleBody, AiResponse))
+	chatID := 0
+	if h.IsGroup {
+		chatID = h.TeleID
+	}
+	Remind(fmt.Sprintf("%s \n %s", ExecAbleBody, AiResponse), chatID)
 }

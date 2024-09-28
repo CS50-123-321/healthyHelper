@@ -48,7 +48,9 @@ type Habit struct {
 	DaysLogByte          []byte `redis:"days_log"`
 	TotalDays            int    `redis:"total_days"` // calc
 	CreatedAt            time.Time
-	Category             string `json:"category" redis:"category"`
+	IsGroup              bool   `redis:"IsGroup"`
+	SoloSre              string `json:"solo"`
+
 	// StartDate
 	// Days count خابط
 }
