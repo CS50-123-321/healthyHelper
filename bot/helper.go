@@ -45,13 +45,22 @@ func FormatMention(Name string, teleID int) (msg string) {
 
 func EscapeMarkdown(text string) string {
 	replacer := strings.NewReplacer(
-		"-", "\\-",
-		"!", "\\!",
-		"#", "\\#",
-		".", "\\.",
+		"_", "\\_",
+		"*", "\\*",
+		"[", "\\[",
+		"]", "\\]",
 		"(", "\\(",
 		")", "\\)",
-
+		"~", "\\~",
+		"`", "\\`",
+		">", "\\>",
+		"#", "\\#",
+		"+", "\\+",
+		"-", "\\-",
+		"=", "\\=",
+		"|", "\\|",
+		".", "\\.",
+		"!", "\\!",
 	)
 	return replacer.Replace(text)
 }
