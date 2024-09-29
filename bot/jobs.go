@@ -122,7 +122,7 @@ func MentionAll(habits []Habit) {
 			return
 		}
 		msg := EscapeMarkdown(AiResponse)
-		Remind(fmt.Sprintf("%s\n%s", msg, EscapeMarkdown(MentionAllBody)))
+		Remind(fmt.Sprintf("%s\n%s", msg, MentionAllBody))
 	}
 }
 
