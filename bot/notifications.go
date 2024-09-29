@@ -68,9 +68,9 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 			return  err
 		}
 		// Send the message with bold formatting (MarkdownV2)
-		err = Remind(msg,0)
+		err = Remind(EscapeMarkdown(msg), 0)
 		if err != nil {
-			return  err
+			return err
 		}
 		botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 		// Send the GIF as an animation
