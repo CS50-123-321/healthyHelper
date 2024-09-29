@@ -35,7 +35,7 @@ func Remind(text string, chatID int, tag ...string) (err error) {
 		chatID, _ = strconv.Atoi(os.Getenv("TestingBotID"))
 
 	}
-	_, err = config.B.Send(tele.ChatID(chatID), EscapeMarkdown(text), &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+	_, err = config.B.Send(tele.ChatID(chatID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
 		log.Println("Remind: errsending the msg: ", err, text)
 	}
