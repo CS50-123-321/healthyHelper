@@ -1,15 +1,10 @@
 package bot
 
 import (
-	"StreakHabitBulder/config"
-	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"sort"
 	"time"
-
-	"math/rand"
 )
 
 func BestStreak(AllMemberHabits []Habit) {
@@ -43,7 +38,7 @@ func BestStreak(AllMemberHabits []Habit) {
 			filteredMembers[0].TotalDays,
 			filteredMembers[0].Streaked,
 			filteredMembers[0].HabitName)
-		Remind(progressMsg)
+		Remind(progressMsg, 0)
 	case 2:
 		// For two users
 		progressMsg := "🏆 *Today's Top 2 Winners:* 🏆\n\n"
@@ -55,7 +50,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg)
+		Remind(progressMsg, 0)
 	case 3:
 		progressMsg := "🏆 *Today's Top 3 Winners:* 🏆\n\n"
 		for i := 0; i < 3; i++ {
@@ -66,7 +61,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg)
+		Remind(progressMsg, 0)
 	case 4:
 		progressMsg := "🏆 *Today's Top 4 Winners:* 🏆\n\n"
 		for i := 0; i < 4; i++ {
@@ -81,7 +76,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg)
+		Remind(progressMsg, 0)
 	case 5:
 		progressMsg := "🏆 *Today's Top 5 Winners:* 🏆\n\n"
 		for i := 0; i < 5; i++ {
@@ -96,7 +91,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg)
+		Remind(progressMsg, 0)
 	}
 }
 
@@ -122,55 +117,54 @@ func MentionAll(habits []Habit) {
 			return
 		}
 		msg := EscapeMarkdown(AiResponse)
-		Remind(fmt.Sprintf("%s\n%s", msg, MentionAllBody))
+		Remind(fmt.Sprintf("%s\n%s", msg, MentionAllBody), 0)
 	}
 }
 
 func SendAiPersonalizedMsg(habits []Habit) {
-	var tries int = len(habits)
-	if tries == 0 { // to avoid infinite recursivnessnessnessnessness
-		log.Println("all members have recieved an ai generated boost")
-		return
-	}
-	rndIndx := rand.Intn(len(habits))
-	h := habits[rndIndx]
-	found := config.Rdb.SIsMember(context.Background(), "sentList:membersIDS", h.TeleID).Val()
-	if found {
-		habits = append(habits[:rndIndx], habits[rndIndx+1:]...) // cutting the already sent to member and procceed.
-		SendAiPersonalizedMsg(habits)                            // recursively calling back until reaching new memeber
-		return
-	}
-	config.Rdb.SAdd(context.Background(), "sentList:membersIDS", h.TeleID)
-	now := time.Now()
-	midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-	durationUntilMidnight := time.Until(midnight) //set it tobe deletedd after the end of todayyyyy
-	err := config.Rdb.Conn().Expire(context.Background(), "sentList:membersIDS", durationUntilMidnight).Err()
-	if err != nil {
-		fmt.Println("Error setting TTL:", err)
+	// var tries int = len(habits)
+	// if tries == 0 { // to avoid infinite recursivnessnessnessnessness
+	// 	log.Println("all members have recieved an ai generated boost")
+	// 	return
+	// }
+	// rndIndx := rand.Intn(len(habits))
+	// h := habits[rndIndx]
+	// found := config.Rdb.SIsMember(context.Background(), "sentList:membersIDS", h.TeleID).Val()
+	// if found {
+	// 	habits = append(habits[:rndIndx], habits[rndIndx+1:]...) // cutting the already sent to member and procceed.
+	// 	SendAiPersonalizedMsg(habits)                            // recursively calling back until reaching new memeber
+	// 	return
+	// }
+	// config.Rdb.SAdd(context.Background(), "sentList:membersIDS", h.TeleID)
+	// now := time.Now()
+	// midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+	// durationUntilMidnight := time.Until(midnight) //set it tobe deletedd after the end of todayyyyy
+	// err := config.Rdb.Conn().Expire(context.Background(), "sentList:membersIDS", durationUntilMidnight).Err()
+	// if err != nil {
+	// 	fmt.Println("Error setting TTL:", err)
+	// }
+	for _, h := range habits {
+		AiResponse, err := GetAiResponse(h)
+		if err != nil {
+			log.Println("err SendAiPersonalizedMsg", err)
+			return
+		}
+		AiResponse = EscapeMarkdown(AiResponse)
+		tag := FormatMention(h.Name, h.TeleID)
+		Remind(AiResponse, h.TeleID, tag)
+		time.Sleep(10 * time.Second)
 	}
 
-	AiResponse, err := GetAiResponse(h)
-	if err != nil {
-		log.Println("err SendAiPersonalizedMsg", err)
-		return
-	}
-	AiResponse = EscapeMarkdown(AiResponse)
-	ExecAbleBody := FormatMention(h.Name, h.TeleID)
-	Remind(fmt.Sprintf("%s \n %s", ExecAbleBody, AiResponse))
 }
 
 func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	var p HabitMessage
 	for _, h := range memberActiveDaysMap {
-		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
-		if err != nil {
-			log.Println(err)
-			return
-		}
 		var msg string
+		var err error
 		done, ok := h.DaysLog[time.Now().Day()]
 		tag := FormatMention(h.Name, h.TeleID)
-		p.HabitMsgs(h, Dailywtch) // this filles the structs the promits based on the function need.
+		p.HabitMsgs(h, Dailywtch)
 		if ok && !done {
 			msg, err = GenerateText(p.DailyWatch.NotCommited)
 			if err != nil {
@@ -185,7 +179,7 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 			}
 		}
 		if msg != "" {
-			Remind(EscapeMarkdown(msg), tag)
+			Remind(EscapeMarkdown(msg), 0, tag)
 		}
 	}
 }

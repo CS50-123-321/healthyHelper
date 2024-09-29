@@ -4,6 +4,8 @@ import (
 	"StreakHabitBulder/config"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -24,13 +26,16 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-func Remind(text string, tag ...string) (err error) {
+func Remind(text string, chatID int, tag ...string) (err error) {
 	log.Println("running remind")
-	//botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 	if len(tag) == 1 {
 		text = fmt.Sprintf("%s \n %s", tag[0], text)
 	}
-	_, err = config.B.Send(tele.ChatID(-1002327721490), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
+	if chatID == 0 {
+		chatID, _ = strconv.Atoi(os.Getenv("TestingBotID"))
+
+	}
+	_, err = config.B.Send(tele.ChatID(chatID), text, &tele.SendOptions{ParseMode: tele.ModeMarkdownV2, HasSpoiler: false})
 	if err != nil {
 		log.Println("Remind: errsending the msg: ", err, text)
 	}
