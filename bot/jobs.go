@@ -20,25 +20,83 @@ func BestStreak(AllMemberHabits []Habit) {
 	sort.Slice(AllMemberHabits, func(i, j int) bool {
 		return AllMemberHabits[i].TotalDays > AllMemberHabits[j].TotalDays
 	})
-	topDays := AllMemberHabits[0].TotalDays
-	if topDays == 0 {
-		log.Println("BestStreak, no one has done anything impressive sofar, fuck off")
-		return
-	}
-	topUsers := []Tag{}
+	filteredMembers := []Habit{}
 	for _, habit := range AllMemberHabits {
-		if habit.TotalDays == topDays {
-			topUsers = append(topUsers, Tag{
-				TagBody: FormatMention(habit.Name, habit.TeleID),
-				Streak:  habit.Streaked,
-			})
-		} else {
-			break
+		if habit.TotalDays > 1 {
+			filteredMembers = append(filteredMembers, habit)
 		}
 	}
-	for _, tag := range topUsers {
-		msg := fmt.Sprintf("Look at you go\\!\\! \n %s You're already at %v days\\. One step closer to being a habit hero\\!", tag.TagBody, tag.Streak)
-		Remind(msg)
+
+	if len(filteredMembers) == 0 {
+		log.Println("BestStreak, no one has done anything impressive so far, keep pushing!")
+		return
+	}
+
+	numTopUsers := len(filteredMembers)
+	medalEmojis := []string{"🥇", "🥈", "🥉"}
+
+	switch numTopUsers {
+	case 1:
+		// For one user
+		progressMsg := fmt.Sprintf("🏆 *Today's Winner:* 🏆\n\n🥇 %s: Total Days: %d, Streak: %d days, Habit: %s\n\n",
+			FormatMention(filteredMembers[0].Name, filteredMembers[0].TeleID),
+			filteredMembers[0].TotalDays,
+			filteredMembers[0].Streaked,
+			filteredMembers[0].HabitName)
+		Remind(progressMsg)
+	case 2:
+		// For two users
+		progressMsg := "🏆 *Today's Top 2 Winners:* 🏆\n\n"
+		for i := 0; i < 2; i++ {
+			progressMsg += fmt.Sprintf("%s %s: Total Days: %d, Streak: %d days, Habit: %s\n\n",
+				medalEmojis[i],
+				FormatMention(filteredMembers[i].Name, filteredMembers[i].TeleID),
+				filteredMembers[i].TotalDays,
+				filteredMembers[i].Streaked,
+				filteredMembers[i].HabitName)
+		}
+		Remind(progressMsg)
+	case 3:
+		progressMsg := "🏆 *Today's Top 3 Winners:* 🏆\n\n"
+		for i := 0; i < 3; i++ {
+			progressMsg += fmt.Sprintf("%s  %s: Total Days: %d, Streak: %d days, Habit: %s\n\n",
+				medalEmojis[i],
+				FormatMention(filteredMembers[i].Name, filteredMembers[i].TeleID),
+				filteredMembers[i].TotalDays,
+				filteredMembers[i].Streaked,
+				filteredMembers[i].HabitName)
+		}
+		Remind(progressMsg)
+	case 4:
+		progressMsg := "🏆 *Today's Top 4 Winners:* 🏆\n\n"
+		for i := 0; i < 4; i++ {
+			emoji := medalEmojis[i%3]
+			if i >= 3 {
+				emoji = "⭐️"
+			}
+			progressMsg += fmt.Sprintf("%s  %s: Total Days: %d, Streak: %d days, Habit: %s\n\n",
+				emoji,
+				FormatMention(filteredMembers[i].Name, filteredMembers[i].TeleID),
+				filteredMembers[i].TotalDays,
+				filteredMembers[i].Streaked,
+				filteredMembers[i].HabitName)
+		}
+		Remind(progressMsg)
+	case 5:
+		progressMsg := "🏆 *Today's Top 5 Winners:* 🏆\n\n"
+		for i := 0; i < 5; i++ {
+			emoji := medalEmojis[i%3]
+			if i >= 3 {
+				emoji = "⭐️"
+			}
+			progressMsg += fmt.Sprintf("%s  %s: Total Days: %d, Streak: %d days, Habit: %s\n\n",
+				emoji,
+				FormatMention(filteredMembers[i].Name, filteredMembers[i].TeleID),
+				filteredMembers[i].TotalDays,
+				filteredMembers[i].Streaked,
+				filteredMembers[i].HabitName)
+		}
+		Remind(progressMsg)
 	}
 }
 
