@@ -26,13 +26,11 @@ func validateMembers(member *Members) error {
 	return nil
 }
 
-func Remind(text string, chatID int, chatID int, tag ...string) (err error) {
+func Remind(text string, chatID int, tag ...string) (err error) {
 	log.Println("running remind")
 	if chatID == 0 {
 		chatID, _ = strconv.Atoi(os.Getenv("TestingBotID"))
 
-	} else {
-		chatID = chatID
 	}
 
 	if len(tag) == 1 {
