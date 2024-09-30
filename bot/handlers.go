@@ -4,11 +4,8 @@ import (
 	"StreakHabitBulder/config"
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
-	"math/rand"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -177,14 +174,12 @@ func Act(useCase string) (habits []Habit) {
 		if err != nil {
 			return
 		}
+		json.Unmarshal(h.DaysLogByte, &h.DaysLog)
 		habits = append(habits, h)
 		MemberActiveDaysMap[teleID] = h
 	}
 
 	switch useCase {
-	case "SendStatus":
-		log.Println("SendStatus..")
-		habitCalc(MemberActiveDaysMap)
 	case DailyWatchUseCASE:
 		log.Println("dailyWatch..")
 		DailyWatch(MemberActiveDaysMap)
@@ -199,81 +194,6 @@ func Act(useCase string) (habits []Habit) {
 		SendAiPersonalizedMsg(habits)
 	}
 	return habits
-}
-
-func habitCalc(memberActiveDaysMap map[int]Habit) {
-	var highestStreakUser, highestTopHitUser Habit
-	var highestStreak, highestTopHit int
-	streakLeaderboard := []string{}
-
-	for _, habit := range memberActiveDaysMap {
-		if habit.Streaked > highestStreak {
-			highestStreak = habit.Streaked
-			highestStreakUser = habit
-		}
-		if habit.TotalDays > highestTopHit {
-			highestTopHit = habit.TotalDays
-			highestTopHitUser = habit
-		}
-		streakLeaderboard = append(streakLeaderboard, fmt.Sprintf(
-			"🔥 %s is on a streak of %d days for habit **%s**",
-			FormatMention(habit.Name, habit.TeleID), habit.Streaked, habit.HabitName))
-	}
-
-	topHitMsg := fmt.Sprintf(
-		"🏅 Highest Top Hit: %s has completed **%d** days of habit **%s** 🚀",
-		FormatMention(highestTopHitUser.Name, highestTopHitUser.TeleID), highestTopHitUser.TotalDays, highestTopHitUser.HabitName)
-
-	streakMsg := fmt.Sprintf(
-		"🥇 Highest Streak: %s is on a **%d day streak** for habit **%s** Keep going 🔥",
-		FormatMention(highestTopHitUser.Name, highestTopHitUser.TeleID), highestStreakUser.Streaked, highestStreakUser.HabitName)
-
-	summaryMsg := "📊 Daily Habit Overview:\n" +
-		fmt.Sprintf("We’ve got some habit warriors making great progress today 🌟\n") +
-		strings.Join(streakLeaderboard, "\n") + "\n\n" +
-		topHitMsg + "\n" + streakMsg
-	chatID := 0
-	// if highestStreakUser.IsGroup {
-	// 	chatID = highestStreakUser.TeleID
-	// } this is for the group only
-	Remind(summaryMsg, chatID)
-}
-
-func DailyWatch(memberActiveDaysMap map[int]Habit) {
-	var p HabitMessage
-	for _, h := range memberActiveDaysMap {
-		log.Println("00000000", h.Name, h.IsGroup)
-
-		err := json.Unmarshal(h.DaysLogByte, &h.DaysLog)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		var msg string
-		done, ok := h.DaysLog[time.Now().Day()]
-		tag := FormatMention(h.Name, h.TeleID)
-		p.HabitMsgs(h, Dailywtch) // this filles the structs the promits based on the function need.
-		if ok && !done {
-			msg, err = GenerateText(p.DailyWatch.NotCommited)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		} else if ok && done {
-			msg, err = GenerateText(p.DailyWatch.Committed)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}
-		chatID := 0
-		if !h.IsGroup {
-			chatID = h.TeleID
-		}
-		if msg != "" {
-			Remind(EscapeMarkdown(msg), chatID, tag)
-		}
-	}
 }
 
 // GetHabitLevel calculates the habit level based on the commitment period and days completed

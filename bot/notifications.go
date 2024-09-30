@@ -68,6 +68,7 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 			return err
 		}
 		// Send the message with bold formatting (MarkdownV2)
+
 		chatID := 0
 		if h.IsGroup {
 			chatID = h.TeleID

@@ -83,6 +83,16 @@ func VideoImgListner(c tele.Context) (err error) {
 	level := GetHabitLevel(percentageCompleted)
 	// replay with the day count.
 	msg := fmt.Sprintf("%v :Day %d, Streak: %d", level, h.TotalDays, h.Streaked)
+
+	var hm HabitMessage
+	hm.HabitMsgs(Habit{}, "")
+	Aimsg, err := GenerateText(hm.InstantReply.AfterDayCounter)
+	if err != nil {
+		return err
+	}
+
 	config.B.Reply(c.Message(), msg)
+	config.B.Reply(c.Message(), EscapeMarkdown(Aimsg))
+
 	return err
 }

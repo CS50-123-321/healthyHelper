@@ -12,6 +12,9 @@ type HabitMessage struct {
 		Committed   string
 		NotCommited string
 	}
+	InstantReply struct {
+		AfterDayCounter string
+	}
 }
 
 // this helps in the dynamic fetching without the need to prepre all promots, on need approach instead.
@@ -21,6 +24,7 @@ const (
 
 func (hs *HabitMessage) HabitMsgs(h Habit, solo string) {
 	hs.Base.AllowedSymobls = "USE ONLY THE FOLLOWING SYMBOLS IN THE TEXT:  '!',',','?','#'"
+	hs.InstantReply.AfterDayCounter = "In Arabic, Generate five to 10 words sentence simple Arabic poem that is easy to understand for young adults aged 15-22. The poem should convey themes of determination, positivity, and encouragement. Use creative and inspiring Arabic language that avoids clichés and motivates action and perseverance., don't translate"
 	switch solo {
 	case Dailywtch:
 		hs.DailyWatch.Committed = fmt.Sprintf("%s has committed to do %s for today, with today he has been doing his habit for %v. Generte an encouring one line msg for them. %s", h.Name, h.HabitName, h.TotalDays, hs.Base.AllowedSymobls)
