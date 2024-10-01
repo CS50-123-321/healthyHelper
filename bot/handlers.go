@@ -37,9 +37,9 @@ func (h *Habit) SetUserStreak() {
 	sort.Ints(daysLogSlice)
 	sortedMap := make(map[int]bool)
 	for _, day := range daysLogSlice {
-		if day > time.Now().Day() {
-			return
-		}
+		// if day > time.Now().Day() {
+		// 	return
+		// }
 		done := h.DaysLog[day]
 		if done {
 			h.TotalDays++
