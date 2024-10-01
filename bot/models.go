@@ -50,6 +50,7 @@ type Habit struct {
 	CreatedAt            time.Time
 	IsGroup              bool   `redis:"IsGroup"`
 	SoloSre              string `json:"solo"`
+	GroupID              int    `redis:"groupID"`
 
 	// StartDate
 	// Days count خابط

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 )
-
+// Group only
 func BestStreak(AllMemberHabits []Habit) {
 	if len(AllMemberHabits) == 0 {
 		log.Println("BestStreak, no members to get the best of them")
@@ -96,7 +96,7 @@ func BestStreak(AllMemberHabits []Habit) {
 }
 
 var maxRetriesLimit int = 3
-
+// Group only
 func MentionAll(habits []Habit) {
 	var promptLanguage []string = []string{"In English, Generate a morning message for group of habit builders, it has to be cool and motivating",
 		"In Arabic, Generate a morning message for group of habit builders, it has to be cool and motivating"}
@@ -120,7 +120,7 @@ func MentionAll(habits []Habit) {
 		Remind(fmt.Sprintf("%s\n%s", msg, MentionAllBody), 0)
 	}
 }
-
+// Group only
 func SendAiPersonalizedMsg(habits []Habit) {
 	// var tries int = len(habits)
 	// if tries == 0 { // to avoid infinite recursivnessnessnessnessness
@@ -157,6 +157,7 @@ func SendAiPersonalizedMsg(habits []Habit) {
 
 }
 
+// Could be used Solo & By Group
 func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	var p HabitMessage
 	for _, h := range memberActiveDaysMap {
@@ -179,7 +180,11 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 			}
 		}
 		if msg != "" {
-			Remind(EscapeMarkdown(msg), 0, tag)
+			if h.IsGroup {
+				Remind(EscapeMarkdown(msg), h.TeleID, tag)
+			} else {
+				Remind(EscapeMarkdown(msg), 0, tag)
+			}
 		}
 	}
 }

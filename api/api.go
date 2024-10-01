@@ -3,6 +3,7 @@ package api
 import (
 	"StreakHabitBulder/bot"
 	"StreakHabitBulder/config"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,7 +20,6 @@ func Server() {
 	// Initialize Gin router
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-
 	router.LoadHTMLGlob("static/*")
 	router.Static("/static", "./static/")
 
@@ -48,17 +48,29 @@ func Server() {
 			return
 		}
 		if h.SoloSre != "" && h.SoloSre == "no" {
-			h.IsGroup = true
-		} else if h.SoloSre != "" && h.SoloSre == "yes" {
 			h.IsGroup = false
+		} else if h.SoloSre != "" && h.SoloSre == "yes" {
+			h.IsGroup = true
 		}
+		if h.IsGroup {
+			// fetch the groups ids
+			// Save maps group id with its members.
+			chatMember, err := config.B.ChatMemberOf(tele.ChatID(-1002239647108), tele.ChatID(175864127))
+			log.Println("------------", chatMember.User, err)
+			msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+			_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
+			if err != nil {
+				log.Println("err in /create-habit", err)
+				return
+			}
+		}
+		return
 		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"result": h})
-		log.Println("stopping the bot")
 	})
 
 	router.GET("/progress", func(c *gin.Context) {
@@ -101,7 +113,13 @@ func LunchMiniApp() {
 	log.Println("bot is running")
 
 	config.B.Handle("/start", func(c tele.Context) error {
-		log.Println("bot is running")
+		log.Println("start command is running")
+		if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
+			groupID := c.Chat().ID
+			userID := c.Sender().ID
+			log.Println("saving to redis")
+			return SaveGroupIDToRedis(int(userID), int(groupID))
+		}
 		// Create the button with the session ID as a URL parameter
 		webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", c.Sender().ID)
 		inlineBtn := tele.InlineButton{
@@ -147,3 +165,15 @@ func LunchMiniApp() {
 }
 
 func GetHabit(id int) (h bot.Habit, err error) { return bot.GetDaysRecord(bot.RK(id)) }
+func SaveGroupIDToRedis(userid, groupId int) (err error) {
+	err = config.Rdb.HSet(context.Background(), fmt.Sprintf("habitMember:%v", userid), "groupID", groupId).Err()
+	if err != nil {
+		return
+	}
+	err = config.Rdb.SAdd(context.Background(), "groupIds", groupId).Err()
+	if err != nil {
+		return
+	}
+	err = config.Rdb.SAdd(context.Background(), fmt.Sprintf("habitByGroup:%v", groupId), userid).Err()
+	return
+}
