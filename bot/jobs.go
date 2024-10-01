@@ -162,7 +162,7 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 	for _, h := range memberActiveDaysMap {
 		var msg string
 		var err error
-		done, ok := h.DaysLog[time.Now().Day()]
+		done, ok := h.DaysLog[time.Now().Format("2006-01-02")]
 		tag := FormatMention(h.Name, h.TeleID)
 		p.HabitMsgs(h, Dailywtch)
 		if ok && !done {

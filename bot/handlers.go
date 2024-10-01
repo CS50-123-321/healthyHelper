@@ -28,19 +28,24 @@ func (h *Habit) SetUserStreak() {
 
 	h.TotalDays = 0
 	h.Streaked = 0
-	// Sorting the days of the daysRecord
-	daysLogSlice := make([]int, 0, len(h.DaysLog))
-	for day := range h.DaysLog {
-		daysLogSlice = append(daysLogSlice, day)
+	daysLogSlice := make([]string, 0, len(h.DaysLog))
 
+	for dayStr := range h.DaysLog {
+		daysLogSlice = append(daysLogSlice, dayStr)
 	}
-	sort.Ints(daysLogSlice)
-	sortedMap := make(map[int]bool)
-	for _, day := range daysLogSlice {
-		// if day > time.Now().Day() {
-		// 	return
-		// }
-		done := h.DaysLog[day]
+	sort.Strings(daysLogSlice)
+
+	sortedMap := make(map[string]bool)
+	for _, dayStr := range daysLogSlice {
+		day, err := time.Parse("2006-01-02", dayStr)
+		if err != nil {
+			log.Println("err", err)
+			return
+		}
+		if day.After(time.Now()) {
+			return
+		}
+		done := h.DaysLog[dayStr]
 		if done {
 			h.TotalDays++
 			h.Streaked++
@@ -53,7 +58,7 @@ func (h *Habit) SetUserStreak() {
 			}
 			h.Streaked = 0
 		}
-		sortedMap[day] = done
+		sortedMap[dayStr] = done
 	}
 	h.DaysLog = sortedMap
 }
@@ -71,7 +76,7 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 		if h.TotalDays > 1 {
 			percentageCompleted = (h.TotalDays * 100 / h.CommitmentPeriod)
 		}
-		ok := h.NotificationLog[time.Now().Day()]
+		ok := h.NotificationLog[time.Now().Format("2006-01-02")]
 		if !ok {
 			LevelMessage(h, percentageCompleted)
 		} else {
@@ -97,8 +102,8 @@ func SetNotificationLog(key string) error {
 		return nil
 	}
 	// Marking day as true
-	dum := make(map[int]bool)
-	dum[time.Now().Day()] = true
+	dum := make(map[string]bool)
+	dum[time.Now().Format("2006-01-02")] = true
 	h.NotificationLog = dum
 
 	h.NotificationLogBytes, err = json.Marshal(h.NotificationLog)
@@ -123,7 +128,7 @@ func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
 	}
 
 	// Marking day as true
-	h.DaysLog[time.Now().Day()] = false
+	h.DaysLog[time.Now().Format("2006-01-02")] = false
 	h.DaysLogByte, err = json.Marshal(h.DaysLog)
 	if err != nil {
 		return nil

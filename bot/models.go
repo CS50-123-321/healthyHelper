@@ -34,16 +34,16 @@ type Streak struct {
 }
 
 type Habit struct {
-	Name                 string       `json:"name" redis:"name" binding:"required"`
-	HabitName            string       `json:"habit_name" redis:"habit_name" binding:"required"`
-	CommitmentPeriodStr  string       `json:"commitment_period"`
-	CommitmentPeriod     int          `redis:"commitment_period"`
-	TeleID               int          `redis:"tele_id"`
-	TeleIDStr            string       `json:"tele_id"`
-	Streaked             int          `redis:"streaked"`
-	TopHit               int          `redis:"top_hit"` // the highest streak reached.
-	DaysLog              map[int]bool // calc
-	NotificationLog      map[int]bool
+	Name                 string          `json:"name" redis:"name" binding:"required"`
+	HabitName            string          `json:"habit_name" redis:"habit_name" binding:"required"`
+	CommitmentPeriodStr  string          `json:"commitment_period"`
+	CommitmentPeriod     int             `redis:"commitment_period"`
+	TeleID               int             `redis:"tele_id"`
+	TeleIDStr            string          `json:"tele_id"`
+	Streaked             int             `redis:"streaked"`
+	TopHit               int             `redis:"top_hit"` // the highest streak reached.
+	DaysLog              map[string]bool // calc
+	NotificationLog      map[string]bool
 	NotificationLogBytes []byte `redis:"notification_log"`
 	DaysLogByte          []byte `redis:"days_log"`
 	TotalDays            int    `redis:"total_days"` // calc

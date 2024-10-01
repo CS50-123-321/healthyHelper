@@ -47,7 +47,7 @@ func VideoImgListner(c tele.Context) (err error) {
 	if err != nil {
 		return fmt.Errorf("error unmarshalling JSON: %v", err)
 	}
-	h.DaysLog[time.Now().Day()] = true
+	h.DaysLog[time.Now().Format("2006-01-02")] = true
 
 	h.DaysLogByte, err = json.Marshal(h.DaysLog)
 	if err != nil {

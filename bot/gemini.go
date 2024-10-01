@@ -99,7 +99,7 @@ func generateHabitPrompt(habit Habit) string {
 	return prompt
 }
 
-func generateDayLogs(daysLog map[int]bool) string {
+func generateDayLogs(daysLog map[string]bool) string {
 	logSummary := "Progress over the last few days:\n"
 	for day, completed := range daysLog {
 		if completed {
