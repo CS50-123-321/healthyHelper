@@ -51,7 +51,6 @@ func Create(h bot.Habit) (err error) {
 		"top_hit":           h.TopHit,
 		"notification_log":  h.NotificationLogBytes,
 		"created_at":        h.CreatedAt,
-		
 	}).Err()
 	if err != nil {
 		return err
@@ -70,5 +69,18 @@ func Create(h bot.Habit) (err error) {
 }
 func getUserProgress(teleId int) (err error, h bot.Habit) {
 	err = config.Rdb.HGetAll(context.Background(), bot.RK(teleId)).Scan(&h)
+	return
+}
+
+func SaveGroupIDToRedis(userid, groupId int) (err error) {
+	err = config.Rdb.HSet(context.Background(), fmt.Sprintf("habitMember:%v", userid), "groupID", groupId).Err()
+	if err != nil {
+		return
+	}
+	err = config.Rdb.SAdd(context.Background(), "groupIds", groupId).Err()
+	if err != nil {
+		return
+	}
+	err = config.Rdb.SAdd(context.Background(), fmt.Sprintf("habitByGroup:%v", groupId), userid).Err()
 	return
 }

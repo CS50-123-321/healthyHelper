@@ -44,19 +44,49 @@ func Server() {
 		//Save the h data in Redis
 		h.TeleID, err = strconv.Atoi(h.TeleIDStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing session ID"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to convert user ID"})
 			return
 		}
 
-		// fetch the groups ids
-		// Save maps group id with its members.
-		chatMember, err := config.B.ChatMemberOf(tele.ChatID(-1002239647108), tele.ChatID(175864127))
-		log.Println("------------", chatMember.User, err)
-		msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
-		_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
+		var groupIDsStr []string
+		err := config.Rdb.SMembers(c.Request.Context(), "groupIds").ScanSlice(&groupIDsStr)
 		if err != nil {
-			log.Println("err in /create-habit", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to retrieve group IDs"})
 			return
+		}
+		var groupIDs []int
+		for _, idStr := range groupIDsStr {
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid group ID format"})
+				return
+			}
+			groupIDs = append(groupIDs, id)
+		}
+
+		// checking if the usre belongs to any regirested group.
+		for gid := range groupIDs {
+			_, err := config.B.ChatMemberOf(tele.ChatID(gid), &tele.User{ID: int64(h.TeleID)})
+			if err != nil {
+				log.Println("err: ", err)
+				continue
+			}
+			h.GroupId = gid
+			break //TODO: what if the user is found in more than one registered group? I guess I should prompt it.
+		}
+		
+
+		// if the user if new and is not assicated with anygroup then let them add the bot to the group.
+		if h.GroupId == 0 {
+			// fetch the groups ids
+			// Save maps group id with its members.
+			//msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+			msg := "🚀 <a href='https://t.me/MoneyMngmnt_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+			_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
+			if err != nil {
+				log.Println("err in /create-habit", err)
+				return
+			}
 		}
 
 		err = Create(h)
@@ -64,6 +94,7 @@ func Server() {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
 		}
+
 		c.JSON(http.StatusOK, gin.H{"result": h})
 		log.Println("stopping the bot")
 	})
@@ -108,7 +139,13 @@ func LunchMiniApp() {
 	log.Println("bot is running")
 
 	config.B.Handle("/start", func(c tele.Context) error {
-		log.Println("bot is running")
+		log.Println("start command is running")
+		if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
+			groupID := c.Chat().ID
+			userID := c.Sender().ID
+			log.Println("saving to redis")
+			return SaveGroupIDToRedis(int(userID), int(groupID))
+		}
 		// Create the button with the session ID as a URL parameter
 		webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", c.Sender().ID)
 		inlineBtn := tele.InlineButton{
