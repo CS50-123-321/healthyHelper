@@ -47,6 +47,18 @@ func Server() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Missing session ID"})
 			return
 		}
+
+		// fetch the groups ids
+		// Save maps group id with its members.
+		chatMember, err := config.B.ChatMemberOf(tele.ChatID(-1002239647108), tele.ChatID(175864127))
+		log.Println("------------", chatMember.User, err)
+		msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+		_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
+		if err != nil {
+			log.Println("err in /create-habit", err)
+			return
+		}
+
 		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})

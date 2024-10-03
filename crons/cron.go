@@ -9,6 +9,7 @@ import (
 )
 
 func InitCron() {
+	bot.Act(bot.DailyWatchUseCASE)
 	every12("09:00AM", func() { fmt.Println("hey") })                         // 08:15 AM Baghdad Time
 	every12("09:00PM", func() { bot.Act(bot.GenerateAiRandomMemberUseCASE) }) // 08:15 AM Baghdad Time
 	every12("08:10AM", func() { bot.Act(bot.MentionAllUseCASE) })             // 08:15 AM Baghdad Time

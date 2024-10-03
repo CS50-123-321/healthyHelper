@@ -48,9 +48,7 @@ type Habit struct {
 	DaysLogByte          []byte `redis:"days_log"`
 	TotalDays            int    `redis:"total_days"` // calc
 	CreatedAt            time.Time
-	Category             string `json:"category" redis:"category"`
-	// StartDate
-	// Days count خابط
+	GroupId              int `redis:"group_id" json:"group_id"`
 }
 
 func (h *Habit) MarshalBinary() ([]byte, error) {
