@@ -183,3 +183,14 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 		}
 	}
 }
+
+// func UpdateRedis(h Habit) (err error) {
+// 	err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
+// 		Score:  float64(h.GroupId),
+// 		Member: h.TeleID,
+// 	}).Err()
+// 	if err != nil{
+// 		return
+// 	}
+
+// }
