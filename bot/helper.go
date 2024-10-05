@@ -41,7 +41,7 @@ func Remind(text string, chatID int, tag ...string) (err error) {
 	}
 	return err
 }
-func RK(id int) string { return fmt.Sprintf("habitMember:%d", id) }
+func RK(groupId, id int) string { return fmt.Sprintf("habitMember:%v:%v", groupId, id) }
 func FormatMention(Name string, teleID int) (msg string) {
 	return fmt.Sprintf("[%s](tg://user?id=%d)", Name, teleID)
 }

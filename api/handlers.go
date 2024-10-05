@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	redis "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
 )
 
 func Create(h bot.Habit) (err error) {
@@ -39,7 +39,7 @@ func Create(h bot.Habit) (err error) {
 	if err != nil {
 		return err
 	}
-	key := fmt.Sprintf("habitMember:%d", h.TeleID)
+	key := fmt.Sprintf("habitMember:%v:%v", h.GroupId, h.TeleID)
 	err = config.Rdb.HSet(context.Background(), key, map[string]interface{}{
 		"name":              h.Name,
 		"habit_name":        h.HabitName,
@@ -51,13 +51,15 @@ func Create(h bot.Habit) (err error) {
 		"top_hit":           h.TopHit,
 		"notification_log":  h.NotificationLogBytes,
 		"created_at":        h.CreatedAt,
+		"group_id":          h.GroupId,
 	}).Err()
 	if err != nil {
 		return err
 	}
+	fmt.Println("adding members")
 	// Adding all client ID to one space.
 	err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
-		Score:  float64(time.Now().Unix()), // TODO: Make it tele group id tocatogrize them.
+		Score:  float64(h.GroupId),
 		Member: h.TeleID,
 	}).Err()
 	if err != nil {
@@ -67,13 +69,14 @@ func Create(h bot.Habit) (err error) {
 	//bot.Remind(msg)
 	return
 }
-func getUserProgress(teleId int) (err error, h bot.Habit) {
-	err = config.Rdb.HGetAll(context.Background(), bot.RK(teleId)).Scan(&h)
+func getUserProgress(teleId, groupid int) (err error, h bot.Habit) {
+	err = config.Rdb.HGetAll(context.Background(), bot.RK(groupid, teleId)).Scan(&h)
 	return
 }
 
 func SaveGroupIDToRedis(userid, groupId int) (err error) {
-	err = config.Rdb.HSet(context.Background(), fmt.Sprintf("habitMember:%v", userid), "groupID", groupId).Err()
+	key := fmt.Sprintf("habitMember:%v:%v", groupId, userid)
+	err = config.Rdb.HSet(context.Background(), key, "group_id", groupId).Err()
 	if err != nil {
 		return
 	}

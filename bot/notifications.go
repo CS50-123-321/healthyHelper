@@ -63,7 +63,7 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 	}
 	if msg != "" {
 		// Setting the sent notigication true to avoid oversending msgs.
-		err := SetNotificationLog(RK(h.TeleID))
+		err := SetNotificationLog(RK(h.GroupId, h.TeleID))
 		if err != nil {
 			return  err
 		}

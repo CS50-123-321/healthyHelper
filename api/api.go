@@ -65,22 +65,22 @@ func Server() {
 		}
 
 		// checking if the usre belongs to any regirested group.
-		for gid := range groupIDs {
-			_, err := config.B.ChatMemberOf(tele.ChatID(gid), &tele.User{ID: int64(h.TeleID)})
+		for i := range groupIDs {
+			_, err := config.B.ChatMemberOf(tele.ChatID(groupIDs[i]), &tele.User{ID: int64(h.TeleID)})
 			if err != nil {
 				log.Println("err: ", err)
 				continue
 			}
-			h.GroupId = gid
+			h.GroupId = groupIDs[i]
 			break //TODO: what if the user is found in more than one registered group? I guess I should prompt it.
 		}
-		
 
 		// if the user if new and is not assicated with anygroup then let them add the bot to the group.
 		if h.GroupId == 0 {
 			// fetch the groups ids
 			// Save maps group id with its members.
 			//msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+			//TODO: MoneyMngmnt_Bot is wrong, uset the strakhabit
 			msg := "🚀 <a href='https://t.me/MoneyMngmnt_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
 			_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
 			if err != nil {
@@ -88,7 +88,9 @@ func Server() {
 				return
 			}
 		}
-
+		if h.GroupId == 0 {
+			return
+		}
 		err = Create(h)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -107,12 +109,12 @@ func Server() {
 			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 			return
 		}
-		err, h := getUserProgress(p.TeleID)
-		if err != nil {
-			log.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch user progress"})
-			return
-		}
+		// err, h := getUserProgress(p.TeleID)
+		// if err != nil {
+		// 	log.Println(err)
+		// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch user progress"})
+		// 	return
+		// }
 		// Pass 'h' (habit data) to the template
 		c.HTML(http.StatusOK, "progress.html", gin.H{
 			"Habit": h,
@@ -137,28 +139,52 @@ func Server() {
 
 func LunchMiniApp() {
 	log.Println("bot is running")
-
 	config.B.Handle("/start", func(c tele.Context) error {
 		log.Println("start command is running")
 		if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
-			groupID := c.Chat().ID
-			userID := c.Sender().ID
-			log.Println("saving to redis")
-			return SaveGroupIDToRedis(int(userID), int(groupID))
+			return nil
 		}
-		// Create the button with the session ID as a URL parameter
-		webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", c.Sender().ID)
-		inlineBtn := tele.InlineButton{
-			Text:   "Open Mini App!",
-			WebApp: &tele.WebApp{URL: webAppURL},
+		c.Send("Ai-ing welcome msg!")
+		// Message prompting the user to add the bot to a group
+		//msg := "🚀 To track progress in a group, please <a href='https://t.me/MoneyMngmnt_Bot?startgroup=true'>add the bot to your group</a> and let it track everyone's progress!"
+		var hs bot.HabitMessage
+		var h bot.Habit
+		h.Name = c.Sender().FirstName
+		h.CreatedAt = c.Chat().Time()             // using it as temp holder for the time zone, this helps gemeni to use good morning or everinig..
+		hs.HabitMsgs(h, bot.WelcomeOnStartCommad) // just fills the struct as needed--> init.
+		msg, err := bot.GenerateText(hs.StartCommandMsgs.WelcomeMsg)
+		if err != nil {
+			log.Println("err in /create-habit", err)
+			return nil
 		}
+		err = c.Send(msg, tele.ModeHTML)
+		if err != nil {
+			log.Println("err in /create-habit", err)
+			return nil
+		}
+		config.B.Handle(tele.OnAddedToGroup, func(ctx tele.Context) error {
+			log.Println("bot has been added")
+			groupID := ctx.Chat().ID
+			userID := ctx.Sender().ID
+			err := SaveGroupIDToRedis(int(userID), int(groupID))
+			log.Println("saved bot to redis")
+			if err != nil {
+				log.Println("err in LunchMiniApp", err)
+				return err
+			}
+			webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", ctx.Sender().ID)
+			inlineBtn := tele.InlineButton{
+				Text:   "Open Mini App!",
+				WebApp: &tele.WebApp{URL: webAppURL},
+			}
 
-		inlineKeys := [][]tele.InlineButton{
-			{inlineBtn},
-		}
-		// Send the habit information separately
-		c.Send("Click the button below:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
-		log.Println("Stopping the bot")
+			inlineKeys := [][]tele.InlineButton{
+				{inlineBtn},
+			}
+			config.B.Send(tele.ChatID(userID), "Great! Click the button below to start your habit-building journey:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
+			return nil
+		})
+
 		return nil
 	})
 	config.B.Handle("/Me", func(c tele.Context) error {
@@ -189,5 +215,3 @@ func LunchMiniApp() {
 	})
 	config.B.Start()
 }
-
-func GetHabit(id int) (h bot.Habit, err error) { return bot.GetDaysRecord(bot.RK(id)) }
