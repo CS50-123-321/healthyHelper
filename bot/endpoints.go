@@ -16,7 +16,7 @@ func StartBot() {
 }
 
 func StreakListner() {
-	config.B.Handle(tele.OnVideoNote, func(c tele.Context) (err error) {
+	config.B.Handle(tele.OnText, func(c tele.Context) (err error) {
 		VideoImgListner(c)
 		return
 	})

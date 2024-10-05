@@ -134,7 +134,6 @@ func SetNotificationLog(key string) error {
 
 }
 
-
 const (
 	GenerateAiRandomMemberUseCASE = "GenerateAiRandomMember" // This sends ai genereted boost for random member in the goup.#AIGen
 	MentionAllUseCASE             = "MentionAll"             // 	This sends a morning alike msg while mentioning everyone. #AIGen
@@ -212,3 +211,7 @@ type Tag struct {
 	TagBody string
 	Streak  int
 }
+
+// func UpdatedRedis() (err error){
+// 	err := config.B.HGetAll
+// }
