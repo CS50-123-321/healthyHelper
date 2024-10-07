@@ -30,15 +30,19 @@ func StreakListner() {
 }
 func VideoImgListner(c tele.Context) (err error) {
 	var h Habit
+
 	h.TeleID = int(c.Sender().ID)
-	var key = RK(h.TeleID)
-	// Get old records
+	if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
+		h.GroupId = int(c.Chat().ID)
+	}
+
+	var key = RK(h.GroupId, h.TeleID)
 	h, err = GetDaysRecord(key)
 	if err != nil {
 		return fmt.Errorf("error getting days record: %v", err)
 	}
 	if h.TeleID == 0 {
-		msg := fmt.Sprintf("%v hasn't made a habit to commit to", c.Sender().FirstName)
+		msg := fmt.Sprintf("%v hasn't made a habit to commit to within a group", c.Sender().FirstName)
 		config.B.Reply(c.Message(), msg)
 		return fmt.Errorf("this teleID doesn''t exsist in redis: %v", err)
 	}

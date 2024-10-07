@@ -4,8 +4,10 @@ import (
 	"StreakHabitBulder/config"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -62,12 +64,30 @@ func (h *Habit) SetUserStreak() {
 	}
 	h.DaysLog = sortedMap
 }
-func getMembersIDs() (ids []int, err error) {
-	err = config.Rdb.ZRange(context.Background(), "MembersIDS", 0, -1).ScanSlice(&ids)
+
+type MemberOrigin struct {
+	TeleID, GroupId int
+}
+
+func getMembersIDs() (mo []MemberOrigin, err error) {
+	membersWithScores, err := config.Rdb.ZRangeWithScores(context.Background(), "MembersIDS", 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
-	return
+
+	for _, z := range membersWithScores {
+		teleID, err := strconv.Atoi(z.Member.(string))
+		if err != nil {
+			return nil, fmt.Errorf("invalid TeleID: %v", err)
+		}
+
+		mo = append(mo, MemberOrigin{
+			TeleID:  teleID,
+			GroupId: int(z.Score),
+		})
+	}
+
+	return mo, nil
 }
 
 func SetMemberLevel(memberHabit map[int]Habit) {
@@ -113,30 +133,6 @@ func SetNotificationLog(key string) error {
 	return config.Rdb.HSet(context.Background(), key, "notification_log", h.NotificationLogBytes).Err()
 
 }
-func SetOffDay(key string, pipe redis.Pipeliner) redis.Pipeliner {
-	h, err := GetDaysRecord(key)
-	if err != nil {
-		log.Println("error getting days record: %v", err)
-		return nil
-	}
-
-	// Unmarshell it to the struct
-	err = json.Unmarshal([]byte(h.DaysLogByte), &h.DaysLog)
-	if err != nil {
-		log.Println("error unmarshalling JSON: %v", err)
-		return nil
-	}
-
-	// Marking day as true
-	h.DaysLog[time.Now().Format("2006-01-02")] = false
-	h.DaysLogByte, err = json.Marshal(h.DaysLog)
-	if err != nil {
-		return nil
-	}
-	pipe.HSet(context.Background(), key, "days_log", h.DaysLogByte)
-	// New Joiner
-	return pipe
-}
 
 const (
 	GenerateAiRandomMemberUseCASE = "GenerateAiRandomMember" // This sends ai genereted boost for random member in the goup.#AIGen
@@ -147,26 +143,22 @@ const (
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) (habits []Habit) {
+	Update()
 	log.Println("Itratings...")
-	teleIDS, err := getMembersIDs()
+	memberOrigin, err := getMembersIDs()
 	if err != nil {
 		log.Println("err in InitOffDay while getting all member id: ", err)
 		return
 	}
-	if len(teleIDS) == 0 {
+	if len(memberOrigin) == 0 {
 		log.Println("getMembersIDs return empty slice")
 		return []Habit{}
 	}
 	MembersCmdsMap := make(map[int]*redis.MapStringStringCmd)
 	pipe := config.Rdb.Pipeline()
-	for _, TId := range teleIDS {
-		var key = RK(TId)
-		if useCase == "SetDayOff" {
-			pipe = SetOffDay(key, pipe)
-		}
-
-		MembersCmdsMap[TId] = pipe.HGetAll(context.Background(), key)
-
+	for _, origin := range memberOrigin {
+		var key = RK(origin.GroupId, origin.TeleID)
+		MembersCmdsMap[origin.TeleID] = pipe.HGetAll(context.Background(), key)
 	}
 	_, err = pipe.Exec(context.Background())
 	if err != nil {
@@ -219,4 +211,41 @@ func GetHabitLevel(completionPercentage int) string {
 type Tag struct {
 	TagBody string
 	Streak  int
+}
+
+func Update() error {
+	ids := []int{}
+	err := config.Rdb.ZRange(context.Background(), "MembersIDS", 0, -1).ScanSlice(&ids)
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		var h Habit
+		err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
+			Score:  -1002327721490,
+			Member: id,
+		}).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.HGetAll(context.Background(), fmt.Sprintf("habitMember:%v", id)).Scan(&h)
+		if err != nil {
+			return err
+		}
+		h.GroupId = -1002327721490
+		var key = RK(h.GroupId, id)
+		err = config.Rdb.HSet(context.Background(), key, h).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.SAdd(context.Background(), "groupIds", h.GroupId).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.SAdd(context.Background(), fmt.Sprintf("habitByGroup:%v", h.GroupId), id).Err()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
