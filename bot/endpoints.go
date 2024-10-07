@@ -8,7 +8,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -36,32 +35,8 @@ func VideoImgListner(c tele.Context) (err error) {
 	if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
 		h.GroupId = int(c.Chat().ID)
 	}
-	err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
-		Score:  float64(h.GroupId),
-		Member: h.TeleID,
-	}).Err()
-	if err != nil {
-		return
-	}
-	var key = RK(h.GroupId, h.TeleID)
-	err = config.Rdb.HSet(context.Background(), key, map[string]interface{}{
-		"group_id": h.GroupId,
-	}).Err()
-	if err != nil {
-		return
-	}
-	err = config.Rdb.SAdd(context.Background(), "groupIds", h.GroupId).Err()
-	if err != nil {
-		return
-	}
-	err = config.Rdb.SAdd(context.Background(), fmt.Sprintf("habitByGroup:%v", h.GroupId), h.TeleID).Err()
-	if err != nil {
-		return err
-	}
 
-	// Checking if the group id is already registered.
-	//TODO:
-	// Get old records
+	var key = RK(h.GroupId, h.TeleID)
 	h, err = GetDaysRecord(key)
 	if err != nil {
 		return fmt.Errorf("error getting days record: %v", err)

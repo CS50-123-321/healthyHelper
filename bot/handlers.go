@@ -143,6 +143,7 @@ const (
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) (habits []Habit) {
+	Update()
 	log.Println("Itratings...")
 	memberOrigin, err := getMembersIDs()
 	if err != nil {
@@ -212,6 +213,39 @@ type Tag struct {
 	Streak  int
 }
 
-// func UpdatedRedis() (err error){
-// 	err := config.B.HGetAll
-// }
+func Update() error {
+	ids := []int{}
+	err := config.Rdb.ZRange(context.Background(), "MembersIDS", 0, -1).ScanSlice(&ids)
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		var h Habit
+		err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
+			Score:  -1002327721490,
+			Member: id,
+		}).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.HGetAll(context.Background(), fmt.Sprintf("habitMember:%v", id)).Scan(&h)
+		if err != nil {
+			return err
+		}
+		h.GroupId = -1002327721490
+		var key = RK(h.GroupId, id)
+		err = config.Rdb.HSet(context.Background(), key, h).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.SAdd(context.Background(), "groupIds", h.GroupId).Err()
+		if err != nil {
+			return err
+		}
+		err = config.Rdb.SAdd(context.Background(), fmt.Sprintf("habitByGroup:%v", h.GroupId), id).Err()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
