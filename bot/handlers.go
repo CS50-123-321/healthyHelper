@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strconv"
 	"time"
@@ -225,8 +226,9 @@ func Update() error {
 	}
 	for _, id := range ids {
 		var h Habit
+		groupID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 		err = config.Rdb.ZAdd(context.Background(), "MembersIDS", redis.Z{
-			Score:  -1002327721490,
+			Score:  float64(groupID),
 			Member: id,
 		}).Err()
 		if err != nil {
@@ -236,7 +238,7 @@ func Update() error {
 		if err != nil {
 			return err
 		}
-		h.GroupId = -1002327721490
+		h.GroupId = groupID
 		var key = RK(h.GroupId, id)
 		err = config.Rdb.HSet(context.Background(), key, h).Err()
 		if err != nil {

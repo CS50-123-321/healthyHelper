@@ -38,7 +38,7 @@ func BestStreak(AllMemberHabits []Habit) {
 			filteredMembers[0].TotalDays,
 			filteredMembers[0].Streaked,
 			filteredMembers[0].HabitName)
-		Remind(progressMsg, 0)
+		Remind(progressMsg, filteredMembers[0].GroupId)
 	case 2:
 		// For two users
 		progressMsg := "🏆 *Today's Top 2 Winners:* 🏆\n\n"
@@ -50,7 +50,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg, 0)
+		Remind(progressMsg, filteredMembers[0].GroupId)
 	case 3:
 		progressMsg := "🏆 *Today's Top 3 Winners:* 🏆\n\n"
 		for i := 0; i < 3; i++ {
@@ -61,7 +61,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg, 0)
+		Remind(progressMsg, filteredMembers[0].GroupId)
 	case 4:
 		progressMsg := "🏆 *Today's Top 4 Winners:* 🏆\n\n"
 		for i := 0; i < 4; i++ {
@@ -76,7 +76,7 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg, 0)
+		Remind(progressMsg, filteredMembers[0].GroupId)
 	case 5:
 		progressMsg := "🏆 *Today's Top 5 Winners:* 🏆\n\n"
 		for i := 0; i < 5; i++ {
@@ -91,33 +91,41 @@ func BestStreak(AllMemberHabits []Habit) {
 				filteredMembers[i].Streaked,
 				filteredMembers[i].HabitName)
 		}
-		Remind(progressMsg, 0)
+		Remind(progressMsg, filteredMembers[0].GroupId)
 	}
 }
 
 var maxRetriesLimit int = 3
 
+type MentionAllByGroup struct {
+	GroupID        int
+	MentionAllBody string
+}
+
 func MentionAll(habits []Habit) {
 	var promptLanguage []string = []string{"In English, Generate a morning message for group of habit builders, it has to be cool and motivating",
 		"In Arabic, Generate a morning message for group of habit builders, it has to be cool and motivating"}
-	var MentionAllBody string
+	mentionAllByGroup := make(map[int]string)
 	for _, h := range habits {
-		MentionAllBody = MentionAllBody + fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
-	}
-	for i := range promptLanguage {
-		p := promptLanguage[i]
-		AiResponse, err := GenerateText(p)
-		if maxRetriesLimit == 0 {
-			log.Println("reaching max tried in mentionAll")
-			return
+		mentionbody := fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
+		mentionAllByGroup[h.GroupId] += mentionbody
+		for groupid, mentionBody := range mentionAllByGroup {
+			for languageIndx := range promptLanguage {
+				p := promptLanguage[languageIndx]
+				AiResponse, err := GenerateText(p)
+				if maxRetriesLimit == 0 {
+					log.Println("reaching max tried in mentionAll")
+					return
+				}
+				if err != nil {
+					maxRetriesLimit--
+					GenerateText(p)
+					return
+				}
+				msg := EscapeMarkdown(AiResponse)
+				Remind(fmt.Sprintf("%s\n%s", msg, mentionBody), groupid)
+			}
 		}
-		if err != nil {
-			maxRetriesLimit--
-			GenerateText(p)
-			return
-		}
-		msg := EscapeMarkdown(AiResponse)
-		Remind(fmt.Sprintf("%s\n%s", msg, MentionAllBody), 0)
 	}
 }
 
@@ -179,7 +187,7 @@ func DailyWatch(memberActiveDaysMap map[int]Habit) {
 			}
 		}
 		if msg != "" {
-			Remind(EscapeMarkdown(msg), 0, tag)
+			Remind(EscapeMarkdown(msg), h.GroupId, tag)
 		}
 	}
 }

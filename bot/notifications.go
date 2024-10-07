@@ -65,10 +65,10 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 		// Setting the sent notigication true to avoid oversending msgs.
 		err := SetNotificationLog(RK(h.GroupId, h.TeleID))
 		if err != nil {
-			return  err
+			return err
 		}
 		// Send the message with bold formatting (MarkdownV2)
-		err = Remind(EscapeMarkdown(msg), 0)
+		err = Remind(EscapeMarkdown(msg), h.GroupId)
 		if err != nil {
 			return err
 		}
@@ -76,7 +76,7 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 		// Send the GIF as an animation
 		err = sendGIF(botID, os.Getenv("TELE_TOKEN"), gifURL)
 		if err != nil {
-			return  err
+			return err
 		}
 	}
 
