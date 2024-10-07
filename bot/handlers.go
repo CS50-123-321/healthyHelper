@@ -143,7 +143,11 @@ const (
 
 // Since I would need to iterate over members multitimes, so why not making a multi use itrator!!
 func Act(useCase string) (habits []Habit) {
-	Update()
+	err := Update()
+	if err != nil {
+		log.Println("err in update new version, redis shaping: ", err)
+		return
+	}
 	log.Println("Itratings...")
 	memberOrigin, err := getMembersIDs()
 	if err != nil {
