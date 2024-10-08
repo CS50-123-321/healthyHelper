@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"log"
+	"slices"
 	"sort"
 	"time"
 )
@@ -106,10 +107,19 @@ func MentionAll(habits []Habit) {
 	var promptLanguage []string = []string{"In English, Generate a morning message for group of habit builders, it has to be cool and motivating",
 		"In Arabic, Generate a morning message for group of habit builders, it has to be cool and motivating"}
 	mentionAllByGroup := make(map[int]string)
+	//var groupIds []int
+	//err := config.Rdb.SMembers(context.Background(), "groupIds").ScanSlice(&groupIds)
+	var InformedGroupIds []int
 	for _, h := range habits {
 		mentionbody := fmt.Sprintf(" %s, ", FormatMention(h.Name, h.TeleID))
 		mentionAllByGroup[h.GroupId] += mentionbody
 		for groupid, mentionBody := range mentionAllByGroup {
+			informedGroup := slices.Contains(InformedGroupIds, groupid)
+			if informedGroup {
+				continue
+			} else {
+				InformedGroupIds = append(InformedGroupIds, groupid)
+			}
 			for languageIndx := range promptLanguage {
 				p := promptLanguage[languageIndx]
 				AiResponse, err := GenerateText(p)

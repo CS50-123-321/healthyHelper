@@ -13,7 +13,7 @@ func InitCron() {
 	every12("09:00AM", func() { fmt.Println("hey") })                         // 08:15 AM Baghdad Time
 	every12("09:00PM", func() { bot.Act(bot.GenerateAiRandomMemberUseCASE) }) // 08:15 AM Baghdad Time
 	every12("08:10AM", func() { bot.Act(bot.MentionAllUseCASE) })             // 08:15 AM Baghdad Time
-	every12("08:20AM", func() { bot.Act(bot.BestStreakUseCASE) })             // 08:20 AM Baghdad Time
+	every12("09:20PM", func() { bot.Act(bot.BestStreakUseCASE) })             // 08:20 AM Baghdad Time
 	every12("04:36PM", func() { bot.Act(bot.DailyWatchUseCASE) })             // send encourgment to those who have done or didn't do the habit today.
 }
 
