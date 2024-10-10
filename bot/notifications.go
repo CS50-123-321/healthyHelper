@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func LevelMessage(h Habit, percentageCompleted int) (err error) {
@@ -15,8 +14,9 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 		msg = fmt.Sprintf(
 			"🏆 Congratulations, *%s*! You've completed *100%%* of your habit **%s**! You are officially a *Habit Champion*! 🎉 Keep up the great work and continue your streak! 💯🔥",
 			h.Name, h.HabitName)
-		
-		gifURL = "https://vsgif.com/gif/3553131"
+
+		gifURL = "https://media1.giphy.com/media/UZOny91tZDtDyXPrJC/giphy.gif?cid=9b38fe91mnvzk7h19m15st9wp5fuog8o7n4l6u85rzcx0lnm&ep=v1_gifs_search&rid=giphy.gif&ct=g"
+		//gold star for you git https://media3.giphy.com/media/LLYtaSxAuj47fmmwpU/giphy.gif?cid=9b38fe91ye663gwag3ojjunzdw9kk6akwygh47xmz7ttq24l&ep=v1_gifs_search&rid=giphy.gif&ct=g
 		// _, err := certificate.GenerateCertificate(h)
 		// if err != nil {
 		// 	return err
@@ -26,18 +26,18 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 		msg = fmt.Sprintf(
 			"💪 Amazing, *%s*! You've completed *60%%* of your habit **%s**! You're now a *Habit Hero*! Keep pushing forward, you're on fire! 🚀",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/xT9DPpf0zTqRASyzTi/giphy.gif"
+		gifURL = "https://media2.giphy.com/media/jQhdmWUmKgn9bZJxUj/giphy.gif?cid=9b38fe916n4x3ak9bjefcci615suljtzn71m0woqv7unk3zl&ep=v1_gifs_search&rid=giphy.gif&ct=g"
 
 	case percentageCompleted == 40:
 		msg = fmt.Sprintf(
 			"🌟 Great progress, *%s*! You've hit *30%%* of your habit **%s**! You're now a *Motivation Seeker*! Keep that momentum going! 💥",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif"
+		gifURL = "https://media0.giphy.com/media/nhRDKEdPXWaA0NZWxT/giphy.gif?cid=9b38fe91mtvmxvklctoczirh4ig46r0sqenmsiokykd75142&ep=v1_gifs_search&rid=giphy.gif&ct=g"
 	case percentageCompleted == 20:
 		msg = fmt.Sprintf(
 			"✨ Nice start, *%s*! You've completed *20%%* of your habit **%s**! You're officially a *Rising Star*! Keep up the effort, you've got this! ⭐",
 			h.Name, h.HabitName)
-		gifURL = "https://media.giphy.com/media/l46CjFkIMsxw6fQ5K/giphy.gif"
+		gifURL = "https://media0.giphy.com/media/xUNd9Yd1YNOiFd2D16/giphy.gif?cid=9b38fe912hu6qe4ovfmnivjj38rm2175wa2e9jktd4f7i6zn&ep=v1_gifs_search&rid=giphy.gif&ct=g"
 	case percentageCompleted == 0:
 		msg = fmt.Sprintf(
 			"🎉 Welcome, *%s*! 🎉\n\n"+
@@ -59,6 +59,7 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 			h.HabitName,
 			h.CommitmentPeriod,
 		)
+		gifURL = "https://media1.giphy.com/media/443kbHqcFFwOvTuAWf/giphy.gif?cid=9b38fe916n4x3ak9bjefcci615suljtzn71m0woqv7unk3zl&ep=v1_gifs_search&rid=giphy.gif&ct=g"
 
 	}
 	if msg != "" {
@@ -72,9 +73,8 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 		if err != nil {
 			return err
 		}
-		botID, _ := strconv.Atoi(os.Getenv("TestingBotID"))
 		// Send the GIF as an animation
-		err = sendGIF(botID, os.Getenv("TELE_TOKEN"), gifURL)
+		err = sendGIF(h.GroupId, os.Getenv("TELE_TOKEN"), gifURL)
 		if err != nil {
 			return err
 		}
@@ -83,9 +83,9 @@ func LevelMessage(h Habit, percentageCompleted int) (err error) {
 	return nil
 }
 
-func sendGIF(chatID int, botToken string, gifURL string) error {
+func sendGIF(groupID int, botToken string, gifURL string) error {
 	// Construct the Telegram API URL for sending the GIF
-	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo?chat_id=%d&video=%s", botToken, chatID, gifURL)
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo?chat_id=%d&video=%s", botToken, groupID, gifURL)
 
 	// Send the HTTP request
 	resp, err := http.Get(apiURL)
