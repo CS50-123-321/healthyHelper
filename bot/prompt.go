@@ -27,7 +27,7 @@ const (
 )
 
 func (hs *HabitMessage) HabitMsgs(h Habit, category string) {
-	hs.Base.AllowedSymobls = "USE ONLY THE FOLLOWING SYMBOLS IN THE TEXT:  '!',',','?','#'"
+	hs.Base.AllowedSymobls = "IF NEEDED, USE ONLY THE FOLLOWING SYMBOLS IN THE TEXT:  '!',',','?','#'"
 	hs.InstantReply.AfterDayCounter = "In Arabic, Generate five to 10 words sentence simple Arabic poem that is easy to understand for young adults aged 15-22. The poem should convey themes of determination, positivity, and encouragement. Use creative and inspiring Arabic language that avoids clichés and motivates action and perseverance., don't translate"
 	switch category {
 	case Dailywtch:
