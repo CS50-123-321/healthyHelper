@@ -6,8 +6,8 @@ RUN go build -o main main.go
 
 # Run Image
 FROM golang:1.21-alpine
-WORKDIR /appa
+WORKDIR /app
 COPY --from=Builder /app/main .
 COPY .env .
 EXPOSE 8888
-CMD  ["/app/main"]
+CMD  ["/app/main"] 
