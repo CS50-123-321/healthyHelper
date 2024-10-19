@@ -32,12 +32,16 @@ func VideoImgListner(c tele.Context) (err error) {
 	var h Habit
 
 	h.TeleID = int(c.Sender().ID)
+	log.Println("logged used", h.TeleID)
 	if c.Chat().Type == tele.ChatGroup || c.Chat().Type == tele.ChatSuperGroup { // this is only if the user is adding the mini app to another group
 		h.GroupId = int(c.Chat().ID)
 	}
-
+	h.TeleID = 6778676335
+	log.Println("Edited used", h.TeleID)
 	var key = RK(h.GroupId, h.TeleID)
-	h, err = GetDaysRecord(key)
+	log.Println("Key used", key)
+	h, err = GetMemberHabit(key)
+	log.Println("habit used", h)
 	if err != nil {
 		return fmt.Errorf("error getting days record: %v", err)
 	}
@@ -64,6 +68,7 @@ func VideoImgListner(c tele.Context) (err error) {
 		LevelMessage(h, 0)
 		return config.Rdb.HSet(context.Background(), key, h).Err()
 	}
+	log.Println("total and committed used", h.TotalDays, h.CommitmentPeriod)
 	// handle when the user finished the period
 	if h.TotalDays == h.CommitmentPeriod {
 		log.Println("You have made it, set another challege and start again!!")

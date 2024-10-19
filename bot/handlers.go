@@ -22,7 +22,7 @@ func (m *Members) Add(key string) (err error) {
 	return
 }
 
-func GetDaysRecord(key string) (h Habit, err error) {
+func GetMemberHabit(key string) (h Habit, err error) {
 	config.Rdb.HGetAll(context.Background(), key).Scan(&h)
 	return h, err
 }
@@ -110,16 +110,16 @@ func SetMemberLevel(memberHabit map[int]Habit) {
 // This get called by the cron job to run daily and sets the day as false, it will be true if the member did sport.
 
 func SetNotificationLog(key string) error {
-	h, err := GetDaysRecord(key)
+	h, err := GetMemberHabit(key)
 	if err != nil {
-		log.Println("error getting days record: %v", err)
+		log.Printf("error getting days record: %v", err)
 		return nil
 	}
 
 	// Unmarshell it to the struct
 	err = json.Unmarshal([]byte(h.NotificationLogBytes), &h.NotificationLog)
 	if err != nil {
-		log.Println("error unmarshalling JSON: %v", err)
+		log.Printf("error unmarshalling JSON: %v", err)
 		return nil
 	}
 	// Marking day as true
