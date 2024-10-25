@@ -66,8 +66,17 @@ func VideoImgListner(c tele.Context) (err error) {
 	}
 	// handle when the user finished the period
 	if h.TotalDays == h.CommitmentPeriod {
-		log.Println("You have made it, set another challege and start again!!")
-		config.B.Reply(c.Message(), "You have made it, set another challege and start again!!")
+		log.Println("Congrats! 🎉 You've made it this far! Keep pushing forward—I just sent you a private message with your next challenge. I know you’ve got this!")
+		config.B.Reply(c.Message(), "Congrats! 🎉 You've made it this far! Keep pushing forward—I just sent you a private message with your next challenge. I know you’ve got this!")
+		webAppURL := fmt.Sprintf("https://familycody.fly.dev/create-habit?session=%d", c.Sender().ID)
+		inlineBtn := tele.InlineButton{
+			Text:   "Open Mini App!",
+			WebApp: &tele.WebApp{URL: webAppURL},
+		}
+		inlineKeys := [][]tele.InlineButton{
+			{inlineBtn},
+		}
+		config.B.Send(tele.ChatID(tele.ChatID(h.TeleID)), "I love you for all this hard work you're doing, please click below to start new mission:", &tele.ReplyMarkup{InlineKeyboard: inlineKeys})
 		return nil
 	}
 	err = config.Rdb.HSet(context.Background(), key, h).Err()

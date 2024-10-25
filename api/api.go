@@ -80,8 +80,7 @@ func Server() {
 			// fetch the groups ids
 			// Save maps group id with its members.
 			//msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
-			//TODO: MoneyMngmnt_Bot is wrong, uset the strakhabit
-			msg := "🚀 <a href='https://t.me/MoneyMngmnt_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
+			msg := "🚀 <a href='https://t.me/StreakForBetterHabits_Bot?startgroup=true'>Click here to add the bot to your group</a> and let it track everyone's progress!"
 			_, err = config.B.Send(tele.ChatID(h.TeleID), msg, tele.ModeHTML)
 			if err != nil {
 				log.Println("err in /create-habit", err)
