@@ -20,8 +20,9 @@ func StreakListner() {
 		VideoImgListner(c)
 		return
 	})
-	config.B.Handle(tele.OnPhoto, func(c tele.Context) (err error) {
-		VideoImgListner(c)
+	config.B.Handle(tele.OnText, func(c tele.Context) (err error) {
+		log.Println("hey")
+		config.B.Reply(c.Message(), c.Message().Text)
 		return
 	})
 
